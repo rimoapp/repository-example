@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"time"
 
 	"github.com/rimoapp/repository-example/model"
 	"github.com/rimoapp/repository-example/repository"

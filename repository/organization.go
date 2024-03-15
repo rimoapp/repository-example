@@ -7,7 +7,6 @@ import (
 	"github.com/rimoapp/repository-example/model"
 )
 
-// TODO: Delete unused functions
 type OrganizationRepository interface {
 	Get(ctx context.Context, id string) (*model.Organization, error)
 	Delete(ctx context.Context, id string) error
@@ -17,7 +16,7 @@ type OrganizationRepository interface {
 	Set(ctx context.Context, id string, object *model.Organization) error
 }
 
-const organizationCollectionPath = "organizations"
+const organizationsCollectionPath = "organizations"
 
 func NewOrganizationRepository(opts NewRepositoryOption) OrganizationRepository {
 	if opts.DBClient != nil {
@@ -26,7 +25,7 @@ func NewOrganizationRepository(opts NewRepositoryOption) OrganizationRepository 
 		}
 	}
 	return &firestoreOrganizationRepository{
-		firestoreGenericRepository: *newFirestoreGenericRepository[*model.Organization](opts.FirestoreClient, organizationCollectionPath),
+		firestoreGenericRepository: *newFirestoreGenericRepository[*model.Organization](opts.FirestoreClient, organizationsCollectionPath),
 	}
 }
 
@@ -40,6 +39,7 @@ func (r *firestoreOrganizationRepository) List(ctx context.Context, opts *model.
 		return nil, errors.New("collection path is empty")
 	}
 	query := r.client.Collection(collectionPath).Query
+	// NOTE: implement where clause
 	if opts.UserID != "" {
 		query = query.Where("user_id", "==", opts.UserID)
 	}
@@ -55,6 +55,7 @@ type gormOrganizationRepository struct {
 
 func (r *gormOrganizationRepository) List(ctx context.Context, opts *model.OrganizationListOption) ([]*model.Organization, error) {
 	query := r.client
+	// NOTE: implement where clause
 	if opts.UserID != "" {
 		query = query.Where("user_id = ?", opts.UserID)
 	}
