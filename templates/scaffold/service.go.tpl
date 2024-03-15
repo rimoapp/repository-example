@@ -1,8 +1,6 @@
 package service
 
 import (
-	"context"
-
 	"github.com/rimoapp/repository-example/model"
 	"github.com/rimoapp/repository-example/repository"
 )
@@ -16,4 +14,3 @@ func New{{.ModelName}}Service(repo repository.{{.ModelName}}Repository) *{{.Mode
 	base := NewGenericService(repo)
 	return &{{.ModelName}}Service{Repo: repo, BaseGenericService: base}
 }
-

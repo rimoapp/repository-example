@@ -6,7 +6,6 @@ import (
 	"github.com/rimoapp/repository-example/repository"
 	"github.com/rimoapp/repository-example/service"
 )
-
 type NoteHandler struct {
 	BaseGenericHandler[*model.Note, *model.NoteListOption]
 	Service *service.NoteService

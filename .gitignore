@@ -2,3 +2,5 @@ test.db
 .firebaserc
 firebase.json
 *.log
+
+repository-example
