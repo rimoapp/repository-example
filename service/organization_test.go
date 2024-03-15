@@ -34,15 +34,6 @@ func TestOrganization(t *testing.T) {
 	_, err = svc.Get(context.Background(), object.ID)
 	assert.NoError(t, err)
 
-	orgID := "testOrg" + suffix
-	keyValues := map[string]interface{}{"organization_id": orgID}
-	err = svc.Update(context.Background(), object.ID, keyValues)
-	assert.NoError(t, err)
-
-	object, err = svc.Get(context.Background(), object.ID)
-	assert.NoError(t, err)
-	assert.Equal(t, orgID, object.OrganizationID)
-
 	objects, err := svc.List(context.Background(), &model.OrganizationListOption{
 		UserID: userID,
 	})

@@ -19,15 +19,12 @@ type AbstractDataEntity interface {
 
 type AbstractAssociatedEntity interface {
 	AbstractDataEntity
-	IsAuthorized(userID, orgID string) bool
-	SetAssociatedEntityIDs(userID, orgID string)
+	IsAuthorized(userID string) bool
+	SetCreatorID(userID string)
 }
 
-type BaseAssociatedEntity struct {
-	ID             string `json:"id" firestore:"-"`
-	UserID         string `json:"user_id" firestore:"user_id"`
-	OrganizationID string `json:"organization_id" firestore:"organization_id"`
-
+type BaseDataEntity struct {
+	ID        string    `json:"id" firestore:"-"`
 	CreatedAt time.Time `json:"created_at" firestore:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" firestore:"updated_at"`
 
@@ -36,7 +33,7 @@ type BaseAssociatedEntity struct {
 	DeletedAt gorm.DeletedAt `json:"-" firestore:"-" gorm:"index"`
 }
 
-func (a *BaseAssociatedEntity) SetID(id string) {
+func (a *BaseDataEntity) SetID(id string) {
 	a.ID = id
 	// for gorm
 	uid, err := strconv.Atoi(id)
@@ -44,7 +41,7 @@ func (a *BaseAssociatedEntity) SetID(id string) {
 		a.UID = uid
 	}
 }
-func (a *BaseAssociatedEntity) GetID() string {
+func (a *BaseDataEntity) GetID() string {
 	// for gorm
 	if a.ID == "" && a.UID != 0 {
 		return fmt.Sprintf("%d", a.UID)
@@ -52,18 +49,19 @@ func (a *BaseAssociatedEntity) GetID() string {
 	return a.ID
 }
 
-func (a *BaseAssociatedEntity) IsAuthorized(userID, orgID string) bool {
-	if a.UserID == userID {
-		return true
-	}
-	if a.OrganizationID == orgID && orgID != "" {
-		return true
-	}
-	return false
+var _ AbstractDataEntity = (*BaseDataEntity)(nil)
+
+type BaseAssociatedEntity struct {
+	BaseDataEntity
+	UserID string `json:"user_id" firestore:"user_id"`
 }
-func (a *BaseAssociatedEntity) SetAssociatedEntityIDs(userID, orgID string) {
+
+func (a *BaseAssociatedEntity) IsAuthorized(userID string) bool {
+	return a.UserID == userID
+}
+
+func (a *BaseAssociatedEntity) SetCreatorID(userID string) {
 	a.UserID = userID
-	a.OrganizationID = orgID
 }
 
 // Update Operation for repository

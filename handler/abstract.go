@@ -30,7 +30,7 @@ func (h *BaseGenericHandler[T]) authWithEntity(c *gin.Context) (T, bool) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to get").Error()})
 		return entity, false
 	}
-	if !entity.IsAuthorized(c.GetString("user_id"), c.GetString("organization_id")) {
+	if !entity.IsAuthorized(c.GetString("user_id")) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "not found"})
 		return entity, false
 	}
@@ -51,7 +51,7 @@ func (h *BaseGenericHandler[T]) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": errors.Wrap(err, "failed to bind params").Error()})
 		return
 	}
-	entity.SetAssociatedEntityIDs(c.GetString("user_id"), c.GetString("organization_id"))
+	entity.SetCreatorID(c.GetString("user_id"))
 	id, err := h.Service.Create(c, entity)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})

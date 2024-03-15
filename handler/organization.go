@@ -40,7 +40,7 @@ func (h *OrganizationHandler) List(c *gin.Context) {
 	}
 	filtered := []*model.Organization{}
 	for _, entity := range entities {
-		if entity.IsAuthorized(c.GetString("user_id"), c.GetString("organization_id")) {
+		if entity.IsAuthorized(c.GetString("user_id")) {
 			filtered = append(filtered, entity)
 		}
 	}
