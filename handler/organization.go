@@ -32,7 +32,6 @@ func (h *OrganizationHandler) List(c *gin.Context) {
 		return
 	}
 	opts.UserID = c.GetString("user_id")
-	opts.OrganizationID = c.GetString("organization_id")
 	entities, err := h.Service.List(c, opts)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})

@@ -22,8 +22,8 @@ type BaseGenericService[T model.AbstractDataEntity] struct {
 
 var _ AbstractGenericService[model.AbstractDataEntity] = &BaseGenericService[model.AbstractDataEntity]{}
 
-func NewGenericService[T model.AbstractDataEntity](repo repository.AbstractGenericRepository[T]) AbstractGenericService[T] {
-	return &BaseGenericService[T]{Repo: repo}
+func NewGenericService[T model.AbstractDataEntity](repo repository.AbstractGenericRepository[T]) BaseGenericService[T] {
+	return BaseGenericService[T]{Repo: repo}
 }
 
 func (s *BaseGenericService[T]) Get(ctx context.Context, id string) (T, error) {

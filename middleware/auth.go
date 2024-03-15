@@ -6,7 +6,11 @@ import (
 
 func AuthMock() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Set("user_id", "login_user_id")
+		loginUserID := c.Query("login_user_id")
+		if loginUserID == "" {
+			loginUserID = "login_user_id"
+		}
+		c.Set("user_id", loginUserID)
 		c.Next()
 	}
 }

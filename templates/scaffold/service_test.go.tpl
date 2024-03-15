@@ -34,6 +34,15 @@ func Test{{.ModelName}}(t *testing.T) {
 	_, err = svc.Get(context.Background(), object.ID)
 	assert.NoError(t, err)
 
+	name := "name" + suffix
+	keyValues := map[string]interface{}{"name": name}
+	err = svc.Update(context.Background(), object.ID, keyValues)
+	assert.NoError(t, err)
+
+	object, err = svc.Get(context.Background(), object.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, name, object.Name)
+
 	objects, err := svc.List(context.Background(), &model.{{.ModelName}}ListOption{
 		UserID: userID,
 	})

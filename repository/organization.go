@@ -43,9 +43,6 @@ func (r *firestoreOrganizationRepository) List(ctx context.Context, opts *model.
 	if opts.UserID != "" {
 		query = query.Where("user_id", "==", opts.UserID)
 	}
-	if opts.OrganizationID != "" {
-		query = query.Where("organization_id", "==", opts.OrganizationID)
-	}
 	return r.firestoreGenericRepository.list(ctx, query)
 }
 
@@ -58,9 +55,6 @@ func (r *gormOrganizationRepository) List(ctx context.Context, opts *model.Organ
 	// NOTE: implement where clause
 	if opts.UserID != "" {
 		query = query.Where("user_id = ?", opts.UserID)
-	}
-	if opts.OrganizationID != "" {
-		query = query.Where("organization_id = ?", opts.OrganizationID)
 	}
 	return r.gormGenericRepository.list(query)
 }

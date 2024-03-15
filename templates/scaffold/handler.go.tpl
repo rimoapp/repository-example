@@ -32,7 +32,6 @@ func (h *{{.ModelName}}Handler) List(c *gin.Context) {
 		return
 	}
 	opts.UserID = c.GetString("user_id")
-	opts.{{.ModelName}}ID = c.GetString("organization_id")
 	entities, err := h.Service.List(c, opts)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
@@ -40,7 +39,7 @@ func (h *{{.ModelName}}Handler) List(c *gin.Context) {
 	}
 	filtered := []*model.{{.ModelName}}{}
 	for _, entity := range entities {
-		if entity.IsAuthorized(c.GetString("user_id"), c.GetString("organization_id")) {
+		if entity.IsAuthorized(c.GetString("user_id")) {
 			filtered = append(filtered, entity)
 		}
 	}

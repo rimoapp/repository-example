@@ -14,7 +14,8 @@ type OrganizationService struct {
 }
 
 func NewOrganizationService(repo repository.OrganizationRepository) *OrganizationService {
-	return &OrganizationService{Repo: repo}
+	base := NewGenericService(repo)
+	return &OrganizationService{Repo: repo, BaseGenericService: base}
 }
 
 func (s *OrganizationService) Create(ctx context.Context, object *model.Organization) (string, error) {

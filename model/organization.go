@@ -7,6 +7,5 @@ type Organization struct {
 }
 
 type OrganizationListOption struct {
-	UserID         string
-	OrganizationID string
+	UserID string
 }

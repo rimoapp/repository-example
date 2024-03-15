@@ -13,7 +13,8 @@ type {{.ModelName}}Service struct {
 }
 
 func New{{.ModelName}}Service(repo repository.{{.ModelName}}Repository) *{{.ModelName}}Service {
-	return &{{.ModelName}}Service{Repo: repo}
+	base := NewGenericService(repo)
+	return &{{.ModelName}}Service{Repo: repo, BaseGenericService: base}
 }
 
 func (s *{{.ModelName}}Service) List(ctx context.Context, opts *model.{{.ModelName}}ListOption) ([]*model.{{.ModelName}}, error) {

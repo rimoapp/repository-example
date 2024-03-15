@@ -27,8 +27,11 @@ func NewRouter() (RimoRouter, error) {
 	rootGroup.Use(middleware.AuthMock())
 
 	orgHandler := handler.NewOrganizationHandler(*opts)
-
 	orgHandler.SetRouter(rootGroup)
+	userHandler := handler.NewUserHandler(*opts)
+	userHandler.SetRouter(rootGroup)
+	noteHandler := handler.NewNoteHandler(*opts)
+	noteHandler.SetRouter(rootGroup)
 
 	rimoRouter := RimoRouter{Handler: router}
 	return rimoRouter, nil
