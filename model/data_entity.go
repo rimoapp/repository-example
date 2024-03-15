@@ -76,6 +76,8 @@ func (b *BaseListOption) SetUserID(userID string) {
 	b.UserID = userID
 }
 
+var _ AbstractListOption = (*BaseListOption)(nil)
+
 // Update Operation for repository
 
 type AbstractUpdateOperation interface {
