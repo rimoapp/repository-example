@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/rimoapp/repository-example/strutil"
 	"github.com/rimoapp/repository-example/model"
 	"github.com/rimoapp/repository-example/repository"
+	"github.com/rimoapp/repository-example/strutil"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -15,7 +15,9 @@ import (
 func Test{{.ModelName}}(t *testing.T) {
 	t.Parallel()
 
-	repo := repository.NewRepository[*model.{{.ModelName}}](repository.NewRepositoryOption{UseInMemory: true})
+	opts, err := repository.BuildNewRepositoryOptionsForTest()
+	assert.NoError(t, err)
+	repo := repository.New{{.ModelName}}Repository(*opts)
 	svc := New{{.ModelName}}Service(repo)
 
 	// Test Create
@@ -25,45 +27,45 @@ func Test{{.ModelName}}(t *testing.T) {
 	object := &model.{{.ModelName}}{}
 	object.UserID = userID
 
-	id, err := svc.Create(context.Background(), object, nil)
+	id, err := svc.Create(context.Background(), object)
 	assert.NoError(t, err)
 	object.ID = id
 
-	_, err = svc.Get(context.Background(), object.ID, nil)
+	_, err = svc.Get(context.Background(), object.ID)
 	assert.NoError(t, err)
 
 	orgID := "testOrg" + suffix
 	keyValues := map[string]interface{}{"organization_id": orgID}
-	err = svc.Update(context.Background(), object.ID, keyValues, nil)
+	err = svc.Update(context.Background(), object.ID, keyValues)
 	assert.NoError(t, err)
 
-	object, err = svc.Get(context.Background(), object.ID, nil)
+	object, err = svc.Get(context.Background(), object.ID)
 	assert.NoError(t, err)
-	assert.Equal(t, orgID, object.OrganizationID)
+	assert.Equal(t, orgID, object.{{.ModelName}}ID)
 
-	objects, err := svc.List(context.Background(), &model.BaseAssociatedListOption[*model.{{.ModelName}}]{
+	objects, err := svc.List(context.Background(), &model.{{.ModelName}}ListOption{
 		UserID: userID,
 	})
 	assert.NoError(t, err)
 	assert.Len(t, objects, 1)
 	assert.Equal(t, id, objects[0].ID)
 
-	objects, err = svc.List(context.Background(), &model.BaseAssociatedListOption[*model.{{.ModelName}}]{
+	objects, err = svc.List(context.Background(), &model.{{.ModelName}}ListOption{
 		UserID: "another" + userID,
 	})
 	assert.NoError(t, err)
 	assert.Len(t, objects, 0)
 
-	err = svc.Delete(context.Background(), object.ID, nil)
+	err = svc.Delete(context.Background(), object.ID)
 	assert.NoError(t, err)
 
-	objects, err = svc.List(context.Background(), &model.BaseAssociatedListOption[*model.{{.ModelName}}]{
+	objects, err = svc.List(context.Background(), &model.{{.ModelName}}ListOption{
 		UserID: userID,
 	})
 	assert.NoError(t, err)
 	assert.Len(t, objects, 0)
 
-	_, err = svc.Get(context.Background(), object.ID, nil)
+	_, err = svc.Get(context.Background(), object.ID)
 	assert.Error(t, err)
 	assert.Equal(t, codes.NotFound, status.Code(err))
 }

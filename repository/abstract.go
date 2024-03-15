@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
-	"firebase.google.com/go/v4/auth"
 	"github.com/rimoapp/repository-example/model"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -24,8 +23,6 @@ type AbstractGenericRepository[T model.AbstractDataEntity] interface {
 
 type NewRepositoryOption struct {
 	FirestoreClient *firestore.Client
-	AuthClient      *auth.Client
-	UseInMemory     bool
 	DBClient        *gorm.DB
 }
 
@@ -66,4 +63,14 @@ func validateKeyValues(keyValues map[string]interface{}) error {
 		}
 	}
 	return nil
+}
+
+func BuildNewRepositoryOptionsForTest() (*NewRepositoryOption, error) {
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	return &NewRepositoryOption{
+		DBClient: db,
+	}, nil
 }

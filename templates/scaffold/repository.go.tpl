@@ -40,6 +40,13 @@ func (r *firestore{{.ModelName}}Repository) List(ctx context.Context, opts *mode
 		return nil, errors.New("collection path is empty")
 	}
 	query := r.client.Collection(collectionPath).Query
+	// NOTE: implement where clause
+	if opts.UserID != "" {
+		query = query.Where("user_id", "==", opts.UserID)
+	}
+	if opts.OrganizationID != "" {
+		query = query.Where("organization_id", "==", opts.OrganizationID)
+	}
 	return r.firestoreGenericRepository.list(ctx, query)
 }
 
@@ -49,6 +56,7 @@ type gorm{{.ModelName}}Repository struct {
 
 func (r *gorm{{.ModelName}}Repository) List(ctx context.Context, opts *model.{{.ModelName}}ListOption) ([]*model.{{.ModelName}}, error) {
 	query := r.client
+	// NOTE: implement where clause
 	if opts.UserID != "" {
 		query = query.Where("user_id = ?", opts.UserID)
 	}

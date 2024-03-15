@@ -15,7 +15,9 @@ import (
 func TestOrganization(t *testing.T) {
 	t.Parallel()
 
-	repo := repository.NewOrganizationRepository(repository.NewRepositoryOption{UseInMemory: true})
+	opts, err := repository.BuildNewRepositoryOptionsForTest()
+	assert.NoError(t, err)
+	repo := repository.NewOrganizationRepository(*opts)
 	svc := NewOrganizationService(repo)
 
 	// Test Create
