@@ -9,12 +9,12 @@ import (
 
 type TeamService struct {
 	Repo repository.TeamRepository
-	BaseGenericService[*model.Team, *model.TeamListOption]
+	baseGenericService[*model.Team, *model.TeamListOption]
 }
 
 func NewTeamService(repo repository.TeamRepository) *TeamService {
-	base := NewGenericService(repo)
-	return &TeamService{Repo: repo, BaseGenericService: base}
+	base := newGenericService(repo)
+	return &TeamService{Repo: repo, baseGenericService: base}
 }
 
 func (s *TeamService) List(ctx context.Context, opts *model.TeamListOption) ([]*model.Team, error) {

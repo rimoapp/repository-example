@@ -9,12 +9,12 @@ import (
 
 type UserService struct {
 	Repo repository.UserRepository
-	BaseGenericService[*model.User, *model.UserListOption]
+	baseGenericService[*model.User, *model.UserListOption]
 }
 
 func NewUserService(repo repository.UserRepository) *UserService {
-	base := NewGenericService(repo)
-	return &UserService{Repo: repo, BaseGenericService: base}
+	base := newGenericService(repo)
+	return &UserService{Repo: repo, baseGenericService: base}
 }
 
 func (s *UserService) List(ctx context.Context, opts *model.UserListOption) ([]*model.User, error) {

@@ -6,6 +6,7 @@ import (
 	"github.com/rimoapp/repository-example/repository"
 	"github.com/rimoapp/repository-example/service"
 )
+
 type {{.ModelName}}Handler struct {
 	baseGenericHandler[*model.{{.ModelName}}, *model.{{.ModelName}}ListOption]
 	svc *service.{{.ModelName}}Service

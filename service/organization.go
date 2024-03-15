@@ -10,13 +10,13 @@ import (
 
 type OrganizationService struct {
 	Repo repository.OrganizationRepository
-	BaseGenericService[*model.Organization, *model.OrganizationListOption]
+	baseGenericService[*model.Organization, *model.OrganizationListOption]
 	TeamService *TeamService
 }
 
 func NewOrganizationService(repo repository.OrganizationRepository, teamService *TeamService) *OrganizationService {
-	base := NewGenericService(repo)
-	return &OrganizationService{Repo: repo, BaseGenericService: base, TeamService: teamService}
+	base := newGenericService(repo)
+	return &OrganizationService{Repo: repo, baseGenericService: base, TeamService: teamService}
 }
 
 func (s *OrganizationService) Create(ctx context.Context, object *model.Organization) (string, error) {
@@ -24,10 +24,6 @@ func (s *OrganizationService) Create(ctx context.Context, object *model.Organiza
 	object.CreatedAt = now
 	object.UpdatedAt = now
 	return s.Repo.Create(ctx, object)
-}
-
-func (s *OrganizationService) List(ctx context.Context, opts *model.OrganizationListOption) ([]*model.Organization, error) {
-	return s.Repo.List(ctx, opts)
 }
 
 func (s *OrganizationService) GetWithOption(ctx context.Context, id string, opts *model.GetOrganizationOption) (*model.Organization, error) {

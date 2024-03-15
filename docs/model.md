@@ -1,6 +1,6 @@
 # model について
 
-repository 層にて扱う関係で model の制約について記載します。
+repository 層にて扱う関係で model の制約について記載する。
 
 ## Model
 
@@ -13,9 +13,9 @@ type AbstractDataEntity interface {
 }
 ```
 
-repository 層にて扱うモデルは上記 `AbstractDataEntity` を満たしてください
+repository 層にて扱うモデルは上記 `AbstractDataEntity` を満たす
 
-これを満たした基底モデルとして以下の `BaseDataEntity` が定義されています
+これを満たした基底モデルとして以下の `BaseDataEntity` が定義される
 
 ```go
 type BaseDataEntity struct {
@@ -29,7 +29,7 @@ type BaseDataEntity struct {
 }
 ```
 
-ので、repository 層で扱うモデルは以下のように`BaseDataEntity`を埋め込むことで実装してください
+ので、repository 層で扱うモデルは以下のように`BaseDataEntity`を埋め込むことで実装する
 
 ```go
 type Note struct {
@@ -50,7 +50,7 @@ type AbstractAssociatedEntity interface {
 
 handler 層にて扱うモデルは上記`AbstractAssociatedEntity` を満たしてください
 
-`AbstractDataEntity` を拡張させたもので、handler 層にてログインユーザを用いた権限チェックを可能にしています
+`AbstractDataEntity` を拡張させたもので、handler 層にてログインユーザを用いた権限チェックを可能にしている
 
 これを満たした基底モデルとして以下の `BaseAssociatedEntity` が定義されています
 
@@ -61,7 +61,7 @@ type BaseAssociatedEntity struct {
 }
 ```
 
-ので、handler 層で扱うモデルは以下のように`BaseAssociatedEntity`を埋め込むことで実装してください
+ので、handler 層で扱うモデルは以下のように`BaseAssociatedEntity`を埋め込むことで実装する
 
 ```go
 type Note struct {
@@ -72,7 +72,7 @@ type Note struct {
 
 ## ListOption
 
-各 Model ごとに ListOption を持ちます。ListOption は以下の interface, `AbstractListOption`を満たしてください
+各 Model ごとに ListOption を持ちます。ListOption は以下の interface, `AbstractListOption`を満たす
 
 ### AbstractListOption / BaseListOption
 
@@ -89,11 +89,11 @@ func (b *BaseListOption) SetUserID(userID string) {
 var _ AbstractListOption = (*BaseListOption)(nil)
 ```
 
-repository 層にて扱う List 関数にて、where 句を生成する際に用いられる interface です
+repository 層にて扱う List 関数にて、where 句を生成する際に用いられる interface.
 
-handler 側でログイン ID をセットさせるため、SetUserID を定義しています
+handler 側でログイン ID をセットさせるため、SetUserID を定義している
 
-AbstractListOption を満たす BaseListOption も併せて定義しているので、各 model の ListOption は以下のように`BaseListOption`を埋め込むことで実装してください
+AbstractListOption を満たす BaseListOption も併せて定義しているので、各 model の ListOption は以下のように`BaseListOption`を埋め込んで実装する
 
 ```go
 type NoteListOption struct {
@@ -104,8 +104,8 @@ type NoteListOption struct {
 
 ## AbstractUpdateOperation
 
-repository 層を分離するにあたって、`firestore.ArrayUnion`等をそのまま用いることができません
+repository 層を分離するにあたって、`firestore.ArrayUnion`等をそのまま用いることができない
 
-そのため `AbstractUpdateOperation`を定義しています
+そのため `AbstractUpdateOperation`を定義しているのでそちらを用いて更新作業を行う
 
 <!-- ちゃんと書く -->
