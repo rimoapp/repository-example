@@ -21,7 +21,7 @@ func New{{.ModelName}}Handler(opts repository.NewRepositoryOption) *{{.ModelName
 }
 func new{{.ModelName}}Handler(repo repository.{{.ModelName}}Repository) *{{.ModelName}}Handler {
 	svc := service.New{{.ModelName}}Service(repo)
-	handler := NewGenericHandler(svc)
+	handler := NewGenericHandler(svc, "{{.Snake}}_id")
 	return &{{.ModelName}}Handler{BaseGenericHandler: *handler, Service: svc}
 }
 
@@ -48,8 +48,8 @@ func (h *{{.ModelName}}Handler) List(c *gin.Context) {
 
 func (h *{{.ModelName}}Handler) SetRouter(group *gin.RouterGroup) {
 	group.GET("/{{.BasePath}}", h.List)
-	group.GET("/{{.BasePath}}/:ID", h.Get)
+	group.GET("/{{.BasePath}}/:{{.Snake}}_id", h.Get)
 	group.POST("/{{.BasePath}}", h.Create)
-	group.DELETE("/{{.BasePath}}/:ID", h.Delete)
-	group.PATCH("/{{.BasePath}}/:ID", h.Update)
+	group.DELETE("/{{.BasePath}}/:{{.Snake}}_id", h.Delete)
+	group.PATCH("/{{.BasePath}}/:{{.Snake}}_id", h.Update)
 }

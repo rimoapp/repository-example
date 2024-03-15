@@ -21,7 +21,7 @@ func NewNoteHandler(opts repository.NewRepositoryOption) *NoteHandler {
 }
 func newNoteHandler(repo repository.NoteRepository) *NoteHandler {
 	svc := service.NewNoteService(repo)
-	handler := NewGenericHandler(svc)
+	handler := NewGenericHandler(svc, "note_id")
 	return &NoteHandler{BaseGenericHandler: *handler, Service: svc}
 }
 
@@ -48,8 +48,8 @@ func (h *NoteHandler) List(c *gin.Context) {
 
 func (h *NoteHandler) SetRouter(group *gin.RouterGroup) {
 	group.GET("/notes", h.List)
-	group.GET("/notes/:ID", h.Get)
+	group.GET("/notes/:note_id", h.Get)
 	group.POST("/notes", h.Create)
-	group.DELETE("/notes/:ID", h.Delete)
-	group.PATCH("/notes/:ID", h.Update)
+	group.DELETE("/notes/:note_id", h.Delete)
+	group.PATCH("/notes/:note_id", h.Update)
 }

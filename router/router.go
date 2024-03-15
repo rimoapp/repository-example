@@ -28,6 +28,9 @@ func NewRouter() (RimoRouter, error) {
 
 	orgHandler := handler.NewOrganizationHandler(*opts)
 	orgHandler.SetRouter(rootGroup)
+	orgGroup := rootGroup.Group("/organizations/:organization_id")
+	teamHandler := handler.NewTeamHandler(*opts)
+	teamHandler.SetRouter(orgGroup)
 	userHandler := handler.NewUserHandler(*opts)
 	userHandler.SetRouter(rootGroup)
 	noteHandler := handler.NewNoteHandler(*opts)

@@ -21,7 +21,7 @@ func NewOrganizationHandler(opts repository.NewRepositoryOption) *OrganizationHa
 }
 func newOrganizationHandler(repo repository.OrganizationRepository) *OrganizationHandler {
 	svc := service.NewOrganizationService(repo)
-	handler := NewGenericHandler(svc)
+	handler := NewGenericHandler(svc, "organization_id")
 	return &OrganizationHandler{BaseGenericHandler: *handler, Service: svc}
 }
 
@@ -48,8 +48,8 @@ func (h *OrganizationHandler) List(c *gin.Context) {
 
 func (h *OrganizationHandler) SetRouter(group *gin.RouterGroup) {
 	group.GET("/organizations", h.List)
-	group.GET("/organizations/:ID", h.Get)
+	group.GET("/organizations/:organization_id", h.Get)
 	group.POST("/organizations", h.Create)
-	group.DELETE("/organizations/:ID", h.Delete)
-	group.PATCH("/organizations/:ID", h.Update)
+	group.DELETE("/organizations/:organization_id", h.Delete)
+	group.PATCH("/organizations/:organization_id", h.Update)
 }

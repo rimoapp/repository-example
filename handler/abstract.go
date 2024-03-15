@@ -12,16 +12,17 @@ import (
 )
 
 type BaseGenericHandler[T model.AbstractAssociatedEntity] struct {
-	Service service.AbstractGenericService[T]
+	service service.AbstractGenericService[T]
+	key     string
 }
 
-func NewGenericHandler[T model.AbstractAssociatedEntity](service service.AbstractGenericService[T]) *BaseGenericHandler[T] {
-	return &BaseGenericHandler[T]{Service: service}
+func NewGenericHandler[T model.AbstractAssociatedEntity](service service.AbstractGenericService[T], key string) *BaseGenericHandler[T] {
+	return &BaseGenericHandler[T]{service: service, key: key}
 }
 
 func (h *BaseGenericHandler[T]) authWithEntity(c *gin.Context) (T, bool) {
-	id := c.Param("ID")
-	entity, err := h.Service.Get(c, id)
+	id := c.Param(h.key)
+	entity, err := h.service.Get(c, id)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
 			c.JSON(http.StatusNotFound, gin.H{"message": "not found"})
@@ -52,7 +53,7 @@ func (h *BaseGenericHandler[T]) Create(c *gin.Context) {
 		return
 	}
 	entity.SetCreatorID(c.GetString("user_id"))
-	id, err := h.Service.Create(c, entity)
+	id, err := h.service.Create(c, entity)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
@@ -66,7 +67,7 @@ func (h *BaseGenericHandler[T]) Delete(c *gin.Context) {
 	if !authorized {
 		return
 	}
-	if err := h.Service.Delete(c, entity.GetID()); err != nil {
+	if err := h.service.Delete(c, entity.GetID()); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
 	}
@@ -83,11 +84,11 @@ func (h *BaseGenericHandler[T]) Update(c *gin.Context) {
 	if !authorized {
 		return
 	}
-	if err := h.Service.Update(c, entity.GetID(), req); err != nil {
+	if err := h.service.Update(c, entity.GetID(), req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
 	}
-	entity, err := h.Service.Get(c, entity.GetID())
+	entity, err := h.service.Get(c, entity.GetID())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
