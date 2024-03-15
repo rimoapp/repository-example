@@ -23,7 +23,7 @@ func NewTeamHandler(opts repository.NewRepositoryOption) *TeamHandler {
 }
 func newTeamHandler(repo repository.TeamRepository) *TeamHandler {
 	svc := service.NewTeamService(repo)
-	handler := NewGenericHandler(svc, "team_id")
+	handler := NewGenericHandler(svc, "teamID")
 	return &TeamHandler{BaseGenericHandler: *handler, Service: svc}
 }
 
@@ -50,10 +50,10 @@ func (h *TeamHandler) List(c *gin.Context) {
 
 func (h *TeamHandler) SetRouter(group *gin.RouterGroup) {
 	group.GET("/teams", h.List)
-	group.GET("/teams/:team_id", h.Get)
+	group.GET("/teams/:teamID", h.Get)
 	group.POST("/teams", h.Create)
-	group.DELETE("/teams/:team_id", h.Delete)
-	group.PATCH("/teams/:team_id", h.Update)
+	group.DELETE("/teams/:teamID", h.Delete)
+	group.PATCH("/teams/:teamID", h.Update)
 }
 
 //

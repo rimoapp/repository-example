@@ -17,6 +17,7 @@ type TemplateData struct {
 	ModelName string
 	BasePath  string
 	Snake     string
+	TableName string
 }
 
 var rootCmd = &cobra.Command{
@@ -32,6 +33,7 @@ var rootCmd = &cobra.Command{
 			ModelName: camel,
 			BasePath:  plural,
 			Snake:     snake,
+			TableName: plural,
 		}
 		generateFromTemplate("model.go.tpl", fmt.Sprintf("./model/%s.go", snake), data)
 		generateFromTemplate("service.go.tpl", fmt.Sprintf("./service/%s.go", snake), data)

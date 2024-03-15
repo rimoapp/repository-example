@@ -48,8 +48,8 @@ func (h *OrganizationHandler) List(c *gin.Context) {
 
 func (h *OrganizationHandler) SetRouter(group *gin.RouterGroup) {
 	group.GET("/organizations", h.List)
-	group.GET("/organizations/:organization_id", h.Get)
+	group.GET("/organizations/:organizationID", h.Get)
 	group.POST("/organizations", h.Create)
-	group.DELETE("/organizations/:organization_id", h.Delete)
-	group.PATCH("/organizations/:organization_id", h.Update)
+	group.DELETE("/organizations/:organizationID", h.Delete)
+	group.PATCH("/organizations/:organizationID", h.Update)
 }

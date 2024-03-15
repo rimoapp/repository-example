@@ -21,7 +21,7 @@ func NewUserHandler(opts repository.NewRepositoryOption) *UserHandler {
 }
 func newUserHandler(repo repository.UserRepository) *UserHandler {
 	svc := service.NewUserService(repo)
-	handler := NewGenericHandler(svc, "note_id")
+	handler := NewGenericHandler(svc, "userID")
 	return &UserHandler{BaseGenericHandler: *handler, Service: svc}
 }
 
@@ -48,8 +48,8 @@ func (h *UserHandler) List(c *gin.Context) {
 
 func (h *UserHandler) SetRouter(group *gin.RouterGroup) {
 	group.GET("/users", h.List)
-	group.GET("/users/:user_id", h.Get)
+	group.GET("/users/:userID", h.Get)
 	group.POST("/users", h.Create)
-	group.DELETE("/users/:user_id", h.Delete)
-	group.PATCH("/users/:user_id", h.Update)
+	group.DELETE("/users/:userID", h.Delete)
+	group.PATCH("/users/:userID", h.Update)
 }
