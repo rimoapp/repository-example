@@ -8,11 +8,13 @@ import (
 	"github.com/rimoapp/repository-example/model"
 	"github.com/rimoapp/repository-example/repository"
 	"github.com/rimoapp/repository-example/service"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type OrganizationHandler struct {
-	BaseGenericHandler[*model.Organization, *model.OrganizationListOption]
-	Service *service.OrganizationService
+	baseGenericHandler[*model.Organization, *model.OrganizationListOption]
+	svc *service.OrganizationService
 }
 
 func NewOrganizationHandler(opts repository.NewRepositoryOption) *OrganizationHandler {
@@ -24,28 +26,31 @@ func newOrganizationHandler(repo repository.OrganizationRepository, teamsRepo re
 	teamsSvc := service.NewTeamService(teamsRepo)
 	svc := service.NewOrganizationService(repo, teamsSvc)
 	handler := NewGenericHandler(svc, "organizationID")
-	return &OrganizationHandler{BaseGenericHandler: *handler, Service: svc}
+	return &OrganizationHandler{baseGenericHandler: *handler, svc: svc}
 }
 
-func (h *OrganizationHandler) List(c *gin.Context) {
-	opts := &model.OrganizationListOption{}
-	if err := c.ShouldBind(&opts); err != nil {
+func (h *OrganizationHandler) Get(c *gin.Context) {
+	req := &model.GetOrganizationOption{}
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": errors.Wrap(err, "failed to bind params").Error()})
 		return
 	}
-	opts.UserID = c.GetString("user_id")
-	entities, err := h.Service.List(c, opts)
+
+	id := c.Param(h.idParam)
+	entity, err := h.svc.GetWithOption(c, id, req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
+		if status.Code(err) == codes.NotFound {
+			c.JSON(http.StatusNotFound, gin.H{"message": "not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to get").Error()})
 		return
 	}
-	filtered := []*model.Organization{}
-	for _, entity := range entities {
-		if entity.IsAuthorized(c.GetString("user_id")) {
-			filtered = append(filtered, entity)
-		}
+	if !entity.IsAuthorized(c.GetString("user_id")) {
+		c.JSON(http.StatusNotFound, gin.H{"message": "not found"})
+		return
 	}
-	c.JSON(http.StatusOK, filtered)
+	c.JSON(http.StatusOK, entity)
 }
 
 func (h *OrganizationHandler) SetRouter(group *gin.RouterGroup) {

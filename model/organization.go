@@ -12,5 +12,5 @@ type OrganizationListOption struct {
 }
 
 type GetOrganizationOption struct {
-	IncludeTeams bool
+	IncludeTeams bool `form:"include_teams" json:"include_teams" binding:"omitempty"`
 }

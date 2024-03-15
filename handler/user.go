@@ -11,7 +11,7 @@ import (
 )
 
 type UserHandler struct {
-	BaseGenericHandler[*model.User, *model.UserListOption]
+	baseGenericHandler[*model.User, *model.UserListOption]
 	Service *service.UserService
 }
 
@@ -22,7 +22,7 @@ func NewUserHandler(opts repository.NewRepositoryOption) *UserHandler {
 func newUserHandler(repo repository.UserRepository) *UserHandler {
 	svc := service.NewUserService(repo)
 	handler := NewGenericHandler(svc, "userID")
-	return &UserHandler{BaseGenericHandler: *handler, Service: svc}
+	return &UserHandler{baseGenericHandler: *handler, Service: svc}
 }
 
 func (h *UserHandler) List(c *gin.Context) {

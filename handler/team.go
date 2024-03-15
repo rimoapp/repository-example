@@ -13,7 +13,7 @@ import (
 )
 
 type TeamHandler struct {
-	BaseGenericHandler[*model.Team, *model.TeamListOption]
+	baseGenericHandler[*model.Team, *model.TeamListOption]
 	Service *service.TeamService
 }
 
@@ -24,7 +24,7 @@ func NewTeamHandler(opts repository.NewRepositoryOption) *TeamHandler {
 func newTeamHandler(repo repository.TeamRepository) *TeamHandler {
 	svc := service.NewTeamService(repo)
 	handler := NewGenericHandler(svc, "teamID")
-	return &TeamHandler{BaseGenericHandler: *handler, Service: svc}
+	return &TeamHandler{baseGenericHandler: *handler, Service: svc}
 }
 
 func (h *TeamHandler) List(c *gin.Context) {

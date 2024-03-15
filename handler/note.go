@@ -6,9 +6,10 @@ import (
 	"github.com/rimoapp/repository-example/repository"
 	"github.com/rimoapp/repository-example/service"
 )
+
 type NoteHandler struct {
-	BaseGenericHandler[*model.Note, *model.NoteListOption]
-	Service *service.NoteService
+	baseGenericHandler[*model.Note, *model.NoteListOption]
+	svc *service.NoteService
 }
 
 func NewNoteHandler(opts repository.NewRepositoryOption) *NoteHandler {
@@ -18,7 +19,7 @@ func NewNoteHandler(opts repository.NewRepositoryOption) *NoteHandler {
 func newNoteHandler(repo repository.NoteRepository) *NoteHandler {
 	svc := service.NewNoteService(repo)
 	handler := NewGenericHandler(svc, "noteID")
-	return &NoteHandler{BaseGenericHandler: *handler, Service: svc}
+	return &NoteHandler{baseGenericHandler: *handler, svc: svc}
 }
 
 func (h *NoteHandler) SetRouter(group *gin.RouterGroup) {

@@ -7,8 +7,8 @@ import (
 	"github.com/rimoapp/repository-example/service"
 )
 type {{.ModelName}}Handler struct {
-	BaseGenericHandler[*model.{{.ModelName}}, *model.{{.ModelName}}ListOption]
-	Service *service.{{.ModelName}}Service
+	baseGenericHandler[*model.{{.ModelName}}, *model.{{.ModelName}}ListOption]
+	svc *service.{{.ModelName}}Service
 }
 
 func New{{.ModelName}}Handler(opts repository.NewRepositoryOption) *{{.ModelName}}Handler {
@@ -18,7 +18,7 @@ func New{{.ModelName}}Handler(opts repository.NewRepositoryOption) *{{.ModelName
 func new{{.ModelName}}Handler(repo repository.{{.ModelName}}Repository) *{{.ModelName}}Handler {
 	svc := service.New{{.ModelName}}Service(repo)
 	handler := NewGenericHandler(svc, "{{.Snake}}ID")
-	return &{{.ModelName}}Handler{BaseGenericHandler: *handler, Service: svc}
+	return &{{.ModelName}}Handler{baseGenericHandler: *handler, svc: svc}
 }
 
 func (h *{{.ModelName}}Handler) SetRouter(group *gin.RouterGroup) {
