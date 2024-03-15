@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"reflect"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -28,7 +29,7 @@ func (h *baseGenericHandler[T, U]) authWithEntity(c *gin.Context) (T, bool) {
 			c.JSON(http.StatusNotFound, gin.H{"message": "not found"})
 			return entity, false
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to get").Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to get in auth with entity").Error()})
 		return entity, false
 	}
 	if !entity.IsAuthorized(c.GetString("user_id")) {
@@ -47,11 +48,11 @@ func (h *baseGenericHandler[T, U]) Get(c *gin.Context) {
 }
 
 func (h *baseGenericHandler[T, U]) Create(c *gin.Context) {
-	var entity T
-	if err := c.ShouldBind(&entity); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": errors.Wrap(err, "failed to bind params").Error()})
+	entity, err := bindAndValidate[T](c)
+	if err != nil {
 		return
 	}
+
 	entity.SetCreatorID(c.GetString("user_id"))
 	id, err := h.svc.Create(c, entity)
 	if err != nil {
@@ -97,11 +98,11 @@ func (h *baseGenericHandler[T, U]) Update(c *gin.Context) {
 }
 
 func (h *baseGenericHandler[T, U]) List(c *gin.Context) {
-	var opts U
-	if err := c.ShouldBind(&opts); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": errors.Wrap(err, "failed to bind params").Error()})
+	opts, err := bindAndValidate[U](c)
+	if err != nil {
 		return
 	}
+
 	opts.SetUserID(c.GetString("user_id"))
 	entities, err := h.svc.List(c, opts)
 	if err != nil {
@@ -115,4 +116,23 @@ func (h *baseGenericHandler[T, U]) List(c *gin.Context) {
 		}
 	}
 	c.JSON(http.StatusOK, filtered)
+}
+
+func bindAndValidate[V any](c *gin.Context) (V, error) {
+	t := reflect.TypeOf((*V)(nil)).Elem()
+	ptr := reflect.New(t)
+
+	var empty V
+	if err := c.ShouldBind(ptr.Interface()); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": errors.Wrap(err, "failed to bind params").Error()})
+		return empty, errors.Wrap(err, "failed to bind params")
+	}
+
+	opts, ok := ptr.Elem().Interface().(V)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to cast options to the correct type"})
+		return empty, errors.New("failed to cast options to the correct type")
+	}
+
+	return opts, nil
 }

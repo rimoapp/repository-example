@@ -5,7 +5,7 @@
 ベースとなる Interface は以下のような設計になっている
 
 ```go
-type AbstractGenericService[T model.AbstractDataEntity, U model.AbstractListOption] interface {
+type AbstractGenericService[T model.AbstractEntity, U model.AbstractListOption] interface {
 	Get(ctx context.Context, id string) (T, error)
 	Delete(ctx context.Context, id string) error
 	Create(ctx context.Context, object T) (string, error)
@@ -18,7 +18,7 @@ type AbstractGenericService[T model.AbstractDataEntity, U model.AbstractListOpti
 
 この Interface を満たしていると、このまま BaseGenericHandler で使えるようになる
 
-`AbstractDataEntity`, `AbstractListOption` については[model の詳細ページ参照](./model.md)
+`AbstractEntity`, `AbstractListOption` については[model の詳細ページ参照](./model.md)
 
 ### 例
 

@@ -11,19 +11,20 @@ import (
 	"gorm.io/gorm"
 )
 
-// AbstractDataEntity used in repository
-type AbstractDataEntity interface {
+// AbstractEntity used in repository
+type AbstractEntity interface {
 	GetID() string
 	SetID(id string)
+	BeforeCreate(now time.Time)
 }
 
 type AbstractAssociatedEntity interface {
-	AbstractDataEntity
+	AbstractEntity
 	IsAuthorized(userID string) bool
 	SetCreatorID(userID string)
 }
 
-type BaseDataEntity struct {
+type BaseEntity struct {
 	ID        string    `json:"id" firestore:"-"`
 	CreatedAt time.Time `json:"created_at" firestore:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" firestore:"updated_at"`
@@ -33,7 +34,7 @@ type BaseDataEntity struct {
 	DeletedAt gorm.DeletedAt `json:"-" firestore:"-" gorm:"index"`
 }
 
-func (a *BaseDataEntity) SetID(id string) {
+func (a *BaseEntity) SetID(id string) {
 	a.ID = id
 	// for gorm
 	uid, err := strconv.Atoi(id)
@@ -41,18 +42,26 @@ func (a *BaseDataEntity) SetID(id string) {
 		a.UID = uid
 	}
 }
-func (a *BaseDataEntity) GetID() string {
+func (a *BaseEntity) GetID() string {
 	// for gorm
 	if a.ID == "" && a.UID != 0 {
 		return fmt.Sprintf("%d", a.UID)
 	}
 	return a.ID
 }
+func (a *BaseEntity) BeforeCreate(now time.Time) {
+	if a.CreatedAt.IsZero() {
+		a.CreatedAt = now
+	}
+	if a.UpdatedAt.IsZero() {
+		a.UpdatedAt = now
+	}
+}
 
-var _ AbstractDataEntity = (*BaseDataEntity)(nil)
+var _ AbstractEntity = (*BaseEntity)(nil)
 
 type BaseAssociatedEntity struct {
-	BaseDataEntity
+	BaseEntity
 	UserID string `json:"user_id" firestore:"user_id"`
 }
 
@@ -69,7 +78,7 @@ type AbstractListOption interface {
 }
 
 type BaseListOption struct {
-	UserID string
+	UserID string `json:"user_id" form:"-"`
 }
 
 func (b *BaseListOption) SetUserID(userID string) {

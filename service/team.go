@@ -3,20 +3,34 @@ package service
 import (
 	"context"
 
+	"github.com/pkg/errors"
 	"github.com/rimoapp/repository-example/model"
 	"github.com/rimoapp/repository-example/repository"
 )
 
 type TeamService struct {
-	Repo repository.TeamRepository
+	repo repository.TeamRepository
 	baseGenericService[*model.Team, *model.TeamListOption]
+	userService *UserService
 }
 
-func NewTeamService(repo repository.TeamRepository) *TeamService {
+func NewTeamService(repo repository.TeamRepository, userService *UserService) *TeamService {
 	base := newGenericService(repo)
-	return &TeamService{Repo: repo, baseGenericService: base}
+	return &TeamService{repo: repo, baseGenericService: base, userService: userService}
 }
 
-func (s *TeamService) List(ctx context.Context, opts *model.TeamListOption) ([]*model.Team, error) {
-	return s.Repo.List(ctx, opts)
+func (s *TeamService) AddMember(ctx context.Context, teamID, userID string) error {
+	user, err := s.userService.Get(ctx, userID)
+	if err != nil {
+		return errors.Wrapf(err, "failed to get user:%s", userID)
+	}
+	return s.repo.AddMember(ctx, teamID, user)
+}
+
+func (s *TeamService) DeleteMember(ctx context.Context, teamID, userID string) error {
+	user, err := s.userService.Get(ctx, userID)
+	if err != nil {
+		return err
+	}
+	return s.repo.DeleteMember(ctx, teamID, user)
 }

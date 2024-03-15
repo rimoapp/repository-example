@@ -16,7 +16,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type AbstractGenericRepository[T model.AbstractDataEntity, U model.AbstractListOption] interface {
+type AbstractGenericRepository[T model.AbstractEntity, U model.AbstractListOption] interface {
 	Get(ctx context.Context, id string) (T, error)
 	Delete(ctx context.Context, id string) error
 	Create(ctx context.Context, object T) (string, error)
@@ -55,7 +55,7 @@ func BuildNewRepositoryOptions(ctx context.Context) (*NewRepositoryOption, error
 		DBClient: db,
 	}, nil
 }
-func createNewInstance[T model.AbstractDataEntity]() T {
+func createNewInstance[T model.AbstractEntity]() T {
 	var entity T
 	// reflect.TypeOf を使用して T の型情報を取得
 	t := reflect.TypeOf(entity)

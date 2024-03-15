@@ -7,7 +7,7 @@ import (
 	"github.com/rimoapp/repository-example/repository"
 )
 
-type AbstractGenericService[T model.AbstractDataEntity, U model.AbstractListOption] interface {
+type AbstractGenericService[T model.AbstractEntity, U model.AbstractListOption] interface {
 	Get(ctx context.Context, id string) (T, error)
 	Delete(ctx context.Context, id string) error
 	Create(ctx context.Context, object T) (string, error)
@@ -17,37 +17,36 @@ type AbstractGenericService[T model.AbstractDataEntity, U model.AbstractListOpti
 }
 
 // baseGenericService is a service for generic repository
-type baseGenericService[T model.AbstractDataEntity, U model.AbstractListOption] struct {
-	Repo repository.AbstractGenericRepository[T, U]
+type baseGenericService[T model.AbstractEntity, U model.AbstractListOption] struct {
+	repo repository.AbstractGenericRepository[T, U]
 }
 
-var _ AbstractGenericService[model.AbstractDataEntity, model.AbstractListOption] = &baseGenericService[model.AbstractDataEntity, model.AbstractListOption]{}
+var _ AbstractGenericService[model.AbstractEntity, model.AbstractListOption] = &baseGenericService[model.AbstractEntity, model.AbstractListOption]{}
 
-func newGenericService[T model.AbstractDataEntity, U model.AbstractListOption](repo repository.AbstractGenericRepository[T, U]) baseGenericService[T, U] {
-	return baseGenericService[T, U]{Repo: repo}
+func newGenericService[T model.AbstractEntity, U model.AbstractListOption](repo repository.AbstractGenericRepository[T, U]) baseGenericService[T, U] {
+	return baseGenericService[T, U]{repo: repo}
 }
 
 func (s *baseGenericService[T, U]) Get(ctx context.Context, id string) (T, error) {
-	return s.Repo.Get(ctx, id)
+	return s.repo.Get(ctx, id)
 }
 
 func (s *baseGenericService[T, U]) Delete(ctx context.Context, id string) error {
-	return s.Repo.Delete(ctx, id)
+	return s.repo.Delete(ctx, id)
 }
 
 func (s *baseGenericService[T, U]) Create(ctx context.Context, object T) (string, error) {
-
-	return s.Repo.Create(ctx, object)
+	return s.repo.Create(ctx, object)
 }
 
 func (s *baseGenericService[T, U]) Update(ctx context.Context, id string, keyValues map[string]interface{}) error {
-	return s.Repo.Update(ctx, id, keyValues)
+	return s.repo.Update(ctx, id, keyValues)
 }
 
 func (s *baseGenericService[T, U]) Set(ctx context.Context, id string, object T) error {
-	return s.Repo.Set(ctx, id, object)
+	return s.repo.Set(ctx, id, object)
 }
 
 func (s *baseGenericService[T, U]) List(ctx context.Context, opts U) ([]T, error) {
-	return s.Repo.List(ctx, opts)
+	return s.repo.List(ctx, opts)
 }

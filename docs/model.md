@@ -4,21 +4,21 @@ repository 層にて扱う関係で model の制約について記載する。
 
 ## Model
 
-### AbstractDataEntity
+### AbstractEntity
 
 ```go
-type AbstractDataEntity interface {
+type AbstractEntity interface {
 	GetID() string
 	SetID(id string)
 }
 ```
 
-repository 層にて扱うモデルは上記 `AbstractDataEntity` を満たす
+repository 層にて扱うモデルは上記 `AbstractEntity` を満たす
 
-これを満たした基底モデルとして以下の `BaseDataEntity` が定義される
+これを満たした基底モデルとして以下の `BaseEntity` が定義される
 
 ```go
-type BaseDataEntity struct {
+type BaseEntity struct {
 	ID        string    `json:"id" firestore:"-"`
 	CreatedAt time.Time `json:"created_at" firestore:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" firestore:"updated_at"`
@@ -29,11 +29,11 @@ type BaseDataEntity struct {
 }
 ```
 
-ので、repository 層で扱うモデルは以下のように`BaseDataEntity`を埋め込むことで実装する
+ので、repository 層で扱うモデルは以下のように`BaseEntity`を埋め込むことで実装する
 
 ```go
 type Note struct {
-    BaseDataEntity
+    BaseEntity
     ...(other fields)
 }
 ```
@@ -42,7 +42,7 @@ type Note struct {
 
 ```go
 type AbstractAssociatedEntity interface {
-	AbstractDataEntity
+	AbstractEntity
 	IsAuthorized(userID string) bool
 	SetCreatorID(userID string)
 }
@@ -50,13 +50,13 @@ type AbstractAssociatedEntity interface {
 
 handler 層にて扱うモデルは上記`AbstractAssociatedEntity` を満たしてください
 
-`AbstractDataEntity` を拡張させたもので、handler 層にてログインユーザを用いた権限チェックを可能にしている
+`AbstractEntity` を拡張させたもので、handler 層にてログインユーザを用いた権限チェックを可能にしている
 
 これを満たした基底モデルとして以下の `BaseAssociatedEntity` が定義されています
 
 ```go
 type BaseAssociatedEntity struct {
-	BaseDataEntity
+	BaseEntity
 	UserID string `json:"user_id" firestore:"user_id"`
 }
 ```

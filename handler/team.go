@@ -19,10 +19,9 @@ type TeamHandler struct {
 
 func NewTeamHandler(opts repository.NewRepositoryOption) *TeamHandler {
 	repo := repository.NewTeamRepository(opts)
-	return newTeamHandler(repo)
-}
-func newTeamHandler(repo repository.TeamRepository) *TeamHandler {
-	svc := service.NewTeamService(repo)
+	userRepo := repository.NewUserRepository(opts)
+	userSvc := service.NewUserService(userRepo)
+	svc := service.NewTeamService(repo, userSvc)
 	handler := NewGenericHandler(svc, "teamID")
 	return &TeamHandler{baseGenericHandler: *handler, Service: svc}
 }
@@ -55,12 +54,14 @@ func (h *TeamHandler) SetRouter(group *gin.RouterGroup) {
 	group.POST("/teams", h.Create)
 	group.DELETE("/teams/:teamID", h.Delete)
 	group.PATCH("/teams/:teamID", h.Update)
+	group.POST("/teams/:teamID/members/:userID", h.AddTeamMember)
+	group.DELETE("/teams/:teamID/members/:userID", h.DeleteTeamMember)
 }
 
 //
 
 func (h *TeamHandler) authWithEntity(c *gin.Context) (*model.Team, bool) {
-	id := c.Param("ID")
+	id := c.Param("teamID")
 	entity, err := h.Service.Get(c, id)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
@@ -138,4 +139,28 @@ func (h *TeamHandler) Update(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, entity)
+}
+
+// AddTeamMember adds a member to the team
+func (h *TeamHandler) AddTeamMember(c *gin.Context) {
+	teamID := c.Param("teamID")
+	userID := c.Param("userID")
+	err := h.Service.AddMember(c, teamID, userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to add member").Error()})
+		return
+	}
+	c.Status(http.StatusOK)
+}
+
+// DeleteTeamMember deletes a member from the team
+func (h *TeamHandler) DeleteTeamMember(c *gin.Context) {
+	teamID := c.Param("teamID")
+	userID := c.Param("userID")
+	err := h.Service.DeleteMember(c, teamID, userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to delete member").Error()})
+		return
+	}
+	c.Status(http.StatusOK)
 }

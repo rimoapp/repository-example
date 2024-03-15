@@ -20,12 +20,11 @@ type OrganizationHandler struct {
 func NewOrganizationHandler(opts repository.NewRepositoryOption) *OrganizationHandler {
 	repo := repository.NewOrganizationRepository(opts)
 	teamsRepo := repository.NewTeamRepository(opts)
-	return newOrganizationHandler(repo, teamsRepo)
-}
-func newOrganizationHandler(repo repository.OrganizationRepository, teamsRepo repository.TeamRepository) *OrganizationHandler {
-	teamsSvc := service.NewTeamService(teamsRepo)
+	usersRepo := repository.NewUserRepository(opts)
+	userSvc := service.NewUserService(usersRepo)
+	teamsSvc := service.NewTeamService(teamsRepo, userSvc)
 	svc := service.NewOrganizationService(repo, teamsSvc)
-	handler := NewGenericHandler(svc, "organizationID")
+	handler := NewGenericHandler[*model.Organization, *model.OrganizationListOption](svc, "organizationID")
 	return &OrganizationHandler{baseGenericHandler: *handler, svc: svc}
 }
 

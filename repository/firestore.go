@@ -14,12 +14,12 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-type firestoreGenericRepository[T model.AbstractDataEntity] struct {
+type firestoreGenericRepository[T model.AbstractEntity] struct {
 	client         *firestore.Client
 	collectionPath string // objectによっては動的にcollectionPathを変更しないときもあるので、その場合はこっちを使う
 }
 
-func newFirestoreGenericRepository[T model.AbstractDataEntity](client *firestore.Client, collectionPath string) *firestoreGenericRepository[T] {
+func newFirestoreGenericRepository[T model.AbstractEntity](client *firestore.Client, collectionPath string) *firestoreGenericRepository[T] {
 	return &firestoreGenericRepository[T]{
 		client:         client,
 		collectionPath: collectionPath,
@@ -70,6 +70,7 @@ func (r *firestoreGenericRepository[T]) delete(ctx context.Context, id, collecti
 	return err
 }
 func (r *firestoreGenericRepository[T]) Create(ctx context.Context, obj T) (string, error) {
+	obj.BeforeCreate(time.Now())
 	return r.create(ctx, obj, r.collectionPath)
 }
 func (r *firestoreGenericRepository[T]) create(ctx context.Context, obj T, collectionPath string) (string, error) {
