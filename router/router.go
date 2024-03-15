@@ -1,6 +1,7 @@
 package router
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,8 +17,8 @@ type RimoRouter struct {
 func NewRouter() (RimoRouter, error) {
 	router := gin.New()
 	router.Use(gin.Recovery())
-
-	opts, err := repository.BuildNewRepositoryOptions()
+	ctx := context.Background()
+	opts, err := repository.BuildNewRepositoryOptions(ctx)
 	if err != nil {
 		return RimoRouter{}, err
 	}

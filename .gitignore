@@ -1,1 +1,4 @@
 test.db
+.firebaserc
+firebase.json
+*.log

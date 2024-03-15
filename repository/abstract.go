@@ -3,11 +3,15 @@ package repository
 import (
 	"context"
 	"fmt"
+	"os"
 	"reflect"
 	"time"
 
 	"cloud.google.com/go/firestore"
+	firebase "firebase.google.com/go"
+	"github.com/pkg/errors"
 	"github.com/rimoapp/repository-example/model"
+	"google.golang.org/api/option"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -26,7 +30,23 @@ type NewRepositoryOption struct {
 	DBClient        *gorm.DB
 }
 
-func BuildNewRepositoryOptions() (*NewRepositoryOption, error) {
+func BuildNewRepositoryOptions(ctx context.Context) (*NewRepositoryOption, error) {
+	if os.Getenv("FIRESTORE_EMULATOR_HOST") != "" {
+		fmt.Println("firestore repository")
+		conf := &firebase.Config{ProjectID: "your-project-id"} // プロジェクトIDを設定
+		app, err := firebase.NewApp(ctx, conf, option.WithoutAuthentication())
+		if err != nil {
+			return nil, fmt.Errorf("error initializing app: %v", err)
+		}
+		client, err := app.Firestore(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to initialize firestore client")
+		}
+		return &NewRepositoryOption{
+			FirestoreClient: client,
+		}, nil
+	}
+	fmt.Println("gorm repository")
 	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	if err != nil {
 		return nil, err
