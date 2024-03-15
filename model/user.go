@@ -7,5 +7,5 @@ type User struct {
 }
 
 type UserListOption struct {
-	UserID string
+	BaseListOption
 }

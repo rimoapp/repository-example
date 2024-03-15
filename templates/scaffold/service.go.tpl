@@ -9,7 +9,7 @@ import (
 
 type {{.ModelName}}Service struct {
 	Repo repository.{{.ModelName}}Repository
-	BaseGenericService[*model.{{.ModelName}}]
+	BaseGenericService[*model.{{.ModelName}}, *model.{{.ModelName}}ListOption]
 }
 
 func New{{.ModelName}}Service(repo repository.{{.ModelName}}Repository) *{{.ModelName}}Service {
@@ -17,6 +17,3 @@ func New{{.ModelName}}Service(repo repository.{{.ModelName}}Repository) *{{.Mode
 	return &{{.ModelName}}Service{Repo: repo, BaseGenericService: base}
 }
 
-func (s *{{.ModelName}}Service) List(ctx context.Context, opts *model.{{.ModelName}}ListOption) ([]*model.{{.ModelName}}, error) {
-	return s.Repo.List(ctx, opts)
-}

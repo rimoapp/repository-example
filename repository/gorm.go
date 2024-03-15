@@ -15,8 +15,6 @@ type gormGenericRepository[T model.AbstractDataEntity] struct {
 	client *gorm.DB
 }
 
-var _ AbstractGenericRepository[model.AbstractDataEntity] = &gormGenericRepository[model.AbstractDataEntity]{}
-
 func newGormGenericRepository[T model.AbstractDataEntity](client *gorm.DB) *gormGenericRepository[T] {
 	var object T
 	client.AutoMigrate(object)

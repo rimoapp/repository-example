@@ -11,7 +11,7 @@ import (
 )
 
 type UserHandler struct {
-	BaseGenericHandler[*model.User]
+	BaseGenericHandler[*model.User, *model.UserListOption]
 	Service *service.UserService
 }
 

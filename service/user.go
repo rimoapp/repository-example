@@ -9,7 +9,7 @@ import (
 
 type UserService struct {
 	Repo repository.UserRepository
-	BaseGenericService[*model.User]
+	BaseGenericService[*model.User, *model.UserListOption]
 }
 
 func NewUserService(repo repository.UserRepository) *UserService {

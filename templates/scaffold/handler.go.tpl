@@ -11,7 +11,7 @@ import (
 )
 
 type {{.ModelName}}Handler struct {
-	BaseGenericHandler[*model.{{.ModelName}}]
+	BaseGenericHandler[*model.{{.ModelName}}, *model.{{.ModelName}}ListOption]
 	Service *service.{{.ModelName}}Service
 }
 

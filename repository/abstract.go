@@ -16,13 +16,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type AbstractGenericRepository[T model.AbstractDataEntity] interface {
+type AbstractGenericRepository[T model.AbstractDataEntity, U model.AbstractListOption] interface {
 	Get(ctx context.Context, id string) (T, error)
 	Delete(ctx context.Context, id string) error
 	Create(ctx context.Context, object T) (string, error)
 	Update(ctx context.Context, id string, keyValues map[string]interface{}) error
 	Set(ctx context.Context, id string, object T) error
-	// List(ctx context.Context, options interface{}) ([]T, error)
+	List(ctx context.Context, options U) ([]T, error)
 }
 
 type NewRepositoryOption struct {

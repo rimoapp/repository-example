@@ -3,9 +3,14 @@ package model
 // TODO: implement another field
 type Organization struct {
 	BaseAssociatedEntity
-	Name string `json:"name" firestore:"name"`
+	Name  string  `json:"name" firestore:"name"`
+	Teams []*Team `json:"teams,omitempty" firestore:"-"`
 }
 
 type OrganizationListOption struct {
-	UserID string
+	BaseListOption
+}
+
+type GetOrganizationOption struct {
+	IncludeTeams bool
 }

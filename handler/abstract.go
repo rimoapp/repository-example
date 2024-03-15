@@ -11,16 +11,16 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type BaseGenericHandler[T model.AbstractAssociatedEntity] struct {
-	service service.AbstractGenericService[T]
+type BaseGenericHandler[T model.AbstractAssociatedEntity, U model.AbstractListOption] struct {
+	service service.AbstractGenericService[T, U]
 	idParam string
 }
 
-func NewGenericHandler[T model.AbstractAssociatedEntity](service service.AbstractGenericService[T], idParam string) *BaseGenericHandler[T] {
-	return &BaseGenericHandler[T]{service: service, idParam: idParam}
+func NewGenericHandler[T model.AbstractAssociatedEntity, U model.AbstractListOption](service service.AbstractGenericService[T, U], idParam string) *BaseGenericHandler[T, U] {
+	return &BaseGenericHandler[T, U]{service: service, idParam: idParam}
 }
 
-func (h *BaseGenericHandler[T]) authWithEntity(c *gin.Context) (T, bool) {
+func (h *BaseGenericHandler[T, U]) authWithEntity(c *gin.Context) (T, bool) {
 	id := c.Param(h.idParam)
 	entity, err := h.service.Get(c, id)
 	if err != nil {
@@ -38,7 +38,7 @@ func (h *BaseGenericHandler[T]) authWithEntity(c *gin.Context) (T, bool) {
 	return entity, true
 }
 
-func (h *BaseGenericHandler[T]) Get(c *gin.Context) {
+func (h *BaseGenericHandler[T, U]) Get(c *gin.Context) {
 	entity, authorized := h.authWithEntity(c)
 	if !authorized {
 		return
@@ -46,7 +46,7 @@ func (h *BaseGenericHandler[T]) Get(c *gin.Context) {
 	c.JSON(http.StatusOK, entity)
 }
 
-func (h *BaseGenericHandler[T]) Create(c *gin.Context) {
+func (h *BaseGenericHandler[T, U]) Create(c *gin.Context) {
 	var entity T
 	if err := c.ShouldBind(&entity); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": errors.Wrap(err, "failed to bind params").Error()})
@@ -62,7 +62,7 @@ func (h *BaseGenericHandler[T]) Create(c *gin.Context) {
 	c.JSON(http.StatusOK, entity)
 }
 
-func (h *BaseGenericHandler[T]) Delete(c *gin.Context) {
+func (h *BaseGenericHandler[T, U]) Delete(c *gin.Context) {
 	entity, authorized := h.authWithEntity(c)
 	if !authorized {
 		return
@@ -74,7 +74,7 @@ func (h *BaseGenericHandler[T]) Delete(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func (h *BaseGenericHandler[T]) Update(c *gin.Context) {
+func (h *BaseGenericHandler[T, U]) Update(c *gin.Context) {
 	req := map[string]interface{}{}
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": errors.Wrap(err, "failed to bind params").Error()})
@@ -94,4 +94,25 @@ func (h *BaseGenericHandler[T]) Update(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, entity)
+}
+
+func (h *BaseGenericHandler[T, U]) List(c *gin.Context) {
+	var opts U
+	if err := c.ShouldBind(&opts); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": errors.Wrap(err, "failed to bind params").Error()})
+		return
+	}
+	opts.SetUserID(c.GetString("user_id"))
+	entities, err := h.service.List(c, opts)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
+		return
+	}
+	filtered := []T{}
+	for _, entity := range entities {
+		if entity.IsAuthorized(c.GetString("user_id")) {
+			filtered = append(filtered, entity)
+		}
+	}
+	c.JSON(http.StatusOK, filtered)
 }

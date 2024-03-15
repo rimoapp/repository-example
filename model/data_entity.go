@@ -64,6 +64,18 @@ func (a *BaseAssociatedEntity) SetCreatorID(userID string) {
 	a.UserID = userID
 }
 
+type AbstractListOption interface {
+	SetUserID(userID string)
+}
+
+type BaseListOption struct {
+	UserID string
+}
+
+func (b *BaseListOption) SetUserID(userID string) {
+	b.UserID = userID
+}
+
 // Update Operation for repository
 
 type AbstractUpdateOperation interface {

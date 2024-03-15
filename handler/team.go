@@ -13,7 +13,7 @@ import (
 )
 
 type TeamHandler struct {
-	BaseGenericHandler[*model.Team]
+	BaseGenericHandler[*model.Team, *model.TeamListOption]
 	Service *service.TeamService
 }
 
@@ -33,6 +33,7 @@ func (h *TeamHandler) List(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": errors.Wrap(err, "failed to bind params").Error()})
 		return
 	}
+	opts.OrganizationID = c.Param("organizationID")
 	opts.UserID = c.GetString("user_id")
 	entities, err := h.Service.List(c, opts)
 	if err != nil {

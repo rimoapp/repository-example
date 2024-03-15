@@ -44,14 +44,14 @@ func TestUser(t *testing.T) {
 	assert.Equal(t, name, object.Name)
 
 	objects, err := svc.List(context.Background(), &model.UserListOption{
-		UserID: userID,
+		BaseListOption: model.BaseListOption{UserID: userID},
 	})
 	assert.NoError(t, err)
 	assert.Len(t, objects, 1)
 	assert.Equal(t, id, objects[0].ID)
 
 	objects, err = svc.List(context.Background(), &model.UserListOption{
-		UserID: "another" + userID,
+		BaseListOption: model.BaseListOption{UserID: "another" + userID},
 	})
 	assert.NoError(t, err)
 	assert.Len(t, objects, 0)
@@ -60,7 +60,7 @@ func TestUser(t *testing.T) {
 	assert.NoError(t, err)
 
 	objects, err = svc.List(context.Background(), &model.UserListOption{
-		UserID: userID,
+		BaseListOption: model.BaseListOption{UserID: userID},
 	})
 	assert.NoError(t, err)
 	assert.Len(t, objects, 0)

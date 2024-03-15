@@ -11,17 +11,19 @@ import (
 )
 
 type OrganizationHandler struct {
-	BaseGenericHandler[*model.Organization]
+	BaseGenericHandler[*model.Organization, *model.OrganizationListOption]
 	Service *service.OrganizationService
 }
 
 func NewOrganizationHandler(opts repository.NewRepositoryOption) *OrganizationHandler {
 	repo := repository.NewOrganizationRepository(opts)
-	return newOrganizationHandler(repo)
+	teamsRepo := repository.NewTeamRepository(opts)
+	return newOrganizationHandler(repo, teamsRepo)
 }
-func newOrganizationHandler(repo repository.OrganizationRepository) *OrganizationHandler {
-	svc := service.NewOrganizationService(repo)
-	handler := NewGenericHandler(svc, "organization_id")
+func newOrganizationHandler(repo repository.OrganizationRepository, teamsRepo repository.TeamRepository) *OrganizationHandler {
+	teamsSvc := service.NewTeamService(teamsRepo)
+	svc := service.NewOrganizationService(repo, teamsSvc)
+	handler := NewGenericHandler(svc, "organizationID")
 	return &OrganizationHandler{BaseGenericHandler: *handler, Service: svc}
 }
 

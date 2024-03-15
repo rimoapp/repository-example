@@ -8,5 +8,6 @@ type Team struct {
 }
 
 type TeamListOption struct {
-	UserID string
+	BaseListOption
+	OrganizationID string
 }

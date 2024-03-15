@@ -7,5 +7,5 @@ type {{.ModelName}} struct {
 }
 
 type {{.ModelName}}ListOption struct {
-	UserID         string
+	BaseListOption
 }

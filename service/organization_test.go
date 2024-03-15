@@ -18,7 +18,7 @@ func TestOrganization(t *testing.T) {
 	opts, err := repository.BuildNewRepositoryOptionsForTest()
 	assert.NoError(t, err)
 	repo := repository.NewOrganizationRepository(*opts)
-	svc := NewOrganizationService(repo)
+	svc := NewOrganizationService(repo, nil)
 
 	// Test Create
 	suffix, err := strutil.GenerateRandomString(10)
@@ -35,14 +35,14 @@ func TestOrganization(t *testing.T) {
 	assert.NoError(t, err)
 
 	objects, err := svc.List(context.Background(), &model.OrganizationListOption{
-		UserID: userID,
+		BaseListOption: model.BaseListOption{UserID: userID},
 	})
 	assert.NoError(t, err)
 	assert.Len(t, objects, 1)
 	assert.Equal(t, id, objects[0].ID)
 
 	objects, err = svc.List(context.Background(), &model.OrganizationListOption{
-		UserID: "another" + userID,
+		BaseListOption: model.BaseListOption{UserID: "another" + userID},
 	})
 	assert.NoError(t, err)
 	assert.Len(t, objects, 0)
@@ -51,7 +51,7 @@ func TestOrganization(t *testing.T) {
 	assert.NoError(t, err)
 
 	objects, err = svc.List(context.Background(), &model.OrganizationListOption{
-		UserID: userID,
+		BaseListOption: model.BaseListOption{UserID: userID},
 	})
 	assert.NoError(t, err)
 	assert.Len(t, objects, 0)

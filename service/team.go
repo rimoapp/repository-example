@@ -9,7 +9,7 @@ import (
 
 type TeamService struct {
 	Repo repository.TeamRepository
-	BaseGenericService[*model.Team]
+	BaseGenericService[*model.Team, *model.TeamListOption]
 }
 
 func NewTeamService(repo repository.TeamRepository) *TeamService {
