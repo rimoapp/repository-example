@@ -13,15 +13,15 @@ import (
 
 type BaseGenericHandler[T model.AbstractAssociatedEntity] struct {
 	service service.AbstractGenericService[T]
-	key     string
+	idParam string
 }
 
-func NewGenericHandler[T model.AbstractAssociatedEntity](service service.AbstractGenericService[T], key string) *BaseGenericHandler[T] {
-	return &BaseGenericHandler[T]{service: service, key: key}
+func NewGenericHandler[T model.AbstractAssociatedEntity](service service.AbstractGenericService[T], idParam string) *BaseGenericHandler[T] {
+	return &BaseGenericHandler[T]{service: service, idParam: idParam}
 }
 
 func (h *BaseGenericHandler[T]) authWithEntity(c *gin.Context) (T, bool) {
-	id := c.Param(h.key)
+	id := c.Param(h.idParam)
 	entity, err := h.service.Get(c, id)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
