@@ -17,7 +17,7 @@ func TestNote(t *testing.T) {
 
 	opts, err := repository.BuildNewRepositoryOptionsForTest()
 	assert.NoError(t, err)
-	repo := repository.NewNoteRepository(*opts)
+	repo := repository.NewNoteRepository(opts)
 	svc := NewNoteService(repo)
 
 	// Test Create

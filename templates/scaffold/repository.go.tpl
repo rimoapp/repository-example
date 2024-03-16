@@ -7,7 +7,6 @@ import (
 	"github.com/rimoapp/repository-example/model"
 )
 
-// TODO: Delete unused functions
 type {{.ModelName}}Repository interface {
 	Get(ctx context.Context, id string) (*model.{{.ModelName}}, error)
 	Delete(ctx context.Context, id string) error
@@ -19,14 +18,14 @@ type {{.ModelName}}Repository interface {
 
 const {{.TableName}}CollectionPath = "{{.TableName}}"
 
-func New{{.ModelName}}Repository(opts NewRepositoryOption) {{.ModelName}}Repository {
-	if opts.DBClient != nil {
+func New{{.ModelName}}Repository(opts *NewRepositoryOption) {{.ModelName}}Repository {
+	if opts.dbClient != nil {
 		return &gorm{{.ModelName}}Repository{
-			gormGenericRepository: *newGormGenericRepository[*model.{{.ModelName}}](opts.DBClient),
+			gormGenericRepository: *newGormGenericRepository[*model.{{.ModelName}}](opts.dbClient),
 		}
 	}
 	return &firestore{{.ModelName}}Repository{
-		firestoreGenericRepository: *newFirestoreGenericRepository[*model.{{.ModelName}}](opts.FirestoreClient, {{.TableName}}CollectionPath),
+		firestoreGenericRepository: *newFirestoreGenericRepository[*model.{{.ModelName}}](opts.firestoreClient, {{.TableName}}CollectionPath),
 	}
 }
 

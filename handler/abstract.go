@@ -7,23 +7,23 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/rimoapp/repository-example/model"
-	"github.com/rimoapp/repository-example/service"
+	"github.com/rimoapp/repository-example/usecase"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type baseGenericHandler[T model.AbstractAssociatedEntity, U model.AbstractListOption] struct {
-	svc     service.AbstractGenericService[T, U]
+	useCase usecase.AbstractGenericUseCase[T, U]
 	idParam string
 }
 
-func NewGenericHandler[T model.AbstractAssociatedEntity, U model.AbstractListOption](service service.AbstractGenericService[T, U], idParam string) *baseGenericHandler[T, U] {
-	return &baseGenericHandler[T, U]{svc: service, idParam: idParam}
+func NewGenericHandler[T model.AbstractAssociatedEntity, U model.AbstractListOption](useCase usecase.AbstractGenericUseCase[T, U], idParam string) baseGenericHandler[T, U] {
+	return baseGenericHandler[T, U]{useCase: useCase, idParam: idParam}
 }
 
 func (h *baseGenericHandler[T, U]) authWithEntity(c *gin.Context) (T, bool) {
 	id := c.Param(h.idParam)
-	entity, err := h.svc.Get(c, id)
+	entity, err := h.useCase.Get(c, id)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
 			c.JSON(http.StatusNotFound, gin.H{"message": "not found"})
@@ -48,13 +48,14 @@ func (h *baseGenericHandler[T, U]) Get(c *gin.Context) {
 }
 
 func (h *baseGenericHandler[T, U]) Create(c *gin.Context) {
-	entity, err := bindAndValidate[T](c)
-	if err != nil {
+	entity := createNewInstance[T]()
+	if err := c.ShouldBind(&entity); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": errors.Wrap(err, "failed to bind params").Error()})
 		return
 	}
 
 	entity.SetCreatorID(c.GetString("user_id"))
-	id, err := h.svc.Create(c, entity)
+	id, err := h.useCase.Create(c, entity)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
@@ -68,7 +69,7 @@ func (h *baseGenericHandler[T, U]) Delete(c *gin.Context) {
 	if !authorized {
 		return
 	}
-	if err := h.svc.Delete(c, entity.GetID()); err != nil {
+	if err := h.useCase.Delete(c, entity.GetID()); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
 	}
@@ -85,11 +86,11 @@ func (h *baseGenericHandler[T, U]) Update(c *gin.Context) {
 	if !authorized {
 		return
 	}
-	if err := h.svc.Update(c, entity.GetID(), req); err != nil {
+	if err := h.useCase.Update(c, entity.GetID(), req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
 	}
-	entity, err := h.svc.Get(c, entity.GetID())
+	entity, err := h.useCase.Get(c, entity.GetID())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
@@ -98,13 +99,14 @@ func (h *baseGenericHandler[T, U]) Update(c *gin.Context) {
 }
 
 func (h *baseGenericHandler[T, U]) List(c *gin.Context) {
-	opts, err := bindAndValidate[U](c)
-	if err != nil {
+	opts := createNewInstance[U]()
+	if err := c.ShouldBind(&opts); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": errors.Wrap(err, "failed to bind params").Error()})
 		return
 	}
 
 	opts.SetUserID(c.GetString("user_id"))
-	entities, err := h.svc.List(c, opts)
+	entities, err := h.useCase.List(c, opts)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
@@ -118,21 +120,16 @@ func (h *baseGenericHandler[T, U]) List(c *gin.Context) {
 	c.JSON(http.StatusOK, filtered)
 }
 
-func bindAndValidate[V any](c *gin.Context) (V, error) {
-	t := reflect.TypeOf((*V)(nil)).Elem()
-	ptr := reflect.New(t)
-
-	var empty V
-	if err := c.ShouldBind(ptr.Interface()); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": errors.Wrap(err, "failed to bind params").Error()})
-		return empty, errors.Wrap(err, "failed to bind params")
+func createNewInstance[T any]() T {
+	var entity T
+	// reflect.TypeOf を使用して T の型情報を取得
+	t := reflect.TypeOf(entity)
+	// T がポインタ型の場合、新しいインスタンスを生成
+	if t.Kind() == reflect.Ptr {
+		// 新しいインスタンスを生成して返す
+		newInstance := reflect.New(t.Elem()).Interface()
+		return newInstance.(T)
 	}
-
-	opts, ok := ptr.Elem().Interface().(V)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to cast options to the correct type"})
-		return empty, errors.New("failed to cast options to the correct type")
-	}
-
-	return opts, nil
+	// ポインタでない場合はそのままデフォルト値を返す
+	return entity
 }

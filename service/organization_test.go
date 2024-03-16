@@ -17,8 +17,9 @@ func TestOrganization(t *testing.T) {
 
 	opts, err := repository.BuildNewRepositoryOptionsForTest()
 	assert.NoError(t, err)
-	repo := repository.NewOrganizationRepository(*opts)
-	svc := NewOrganizationService(repo, nil)
+	repo := repository.NewOrganizationRepository(opts)
+
+	svc := NewOrganizationService(repo)
 
 	// Test Create
 	suffix, err := strutil.GenerateRandomString(10)

@@ -6,26 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/rimoapp/repository-example/model"
-	"github.com/rimoapp/repository-example/repository"
-	"github.com/rimoapp/repository-example/service"
+	"github.com/rimoapp/repository-example/usecase"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type OrganizationHandler struct {
 	baseGenericHandler[*model.Organization, *model.OrganizationListOption]
-	svc *service.OrganizationService
+	useCase usecase.OrganizationUseCase
 }
 
-func NewOrganizationHandler(opts repository.NewRepositoryOption) *OrganizationHandler {
-	repo := repository.NewOrganizationRepository(opts)
-	teamsRepo := repository.NewTeamRepository(opts)
-	usersRepo := repository.NewUserRepository(opts)
-	userSvc := service.NewUserService(usersRepo)
-	teamsSvc := service.NewTeamService(teamsRepo, userSvc)
-	svc := service.NewOrganizationService(repo, teamsSvc)
-	handler := NewGenericHandler[*model.Organization, *model.OrganizationListOption](svc, "organizationID")
-	return &OrganizationHandler{baseGenericHandler: *handler, svc: svc}
+func NewOrganizationHandler(useCase usecase.OrganizationUseCase) OrganizationHandler {
+	handler := NewGenericHandler(useCase, "organizationID")
+	return OrganizationHandler{baseGenericHandler: handler, useCase: useCase}
 }
 
 func (h *OrganizationHandler) Get(c *gin.Context) {
@@ -36,7 +29,7 @@ func (h *OrganizationHandler) Get(c *gin.Context) {
 	}
 
 	id := c.Param(h.idParam)
-	entity, err := h.svc.GetWithOption(c, id, req)
+	entity, err := h.useCase.GetWithOption(c, id, req)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
 			c.JSON(http.StatusNotFound, gin.H{"message": "not found"})

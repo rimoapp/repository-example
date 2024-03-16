@@ -17,8 +17,9 @@ func TestTeam(t *testing.T) {
 
 	opts, err := repository.BuildNewRepositoryOptionsForTest()
 	assert.NoError(t, err)
-	repo := repository.NewTeamRepository(*opts)
-	svc := NewTeamService(repo, nil)
+	repo := repository.NewTeamRepository(opts)
+
+	svc := NewTeamService(repo)
 
 	// Test Create
 	suffix, err := strutil.GenerateRandomString(10)

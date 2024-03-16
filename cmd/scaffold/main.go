@@ -14,10 +14,11 @@ import (
 const templatePath = "./templates/scaffold/"
 
 type TemplateData struct {
-	ModelName string
-	BasePath  string
-	Snake     string
-	TableName string
+	ModelName      string
+	BasePath       string
+	Snake          string
+	TableName      string
+	LowerCamelCase string
 }
 
 var rootCmd = &cobra.Command{
@@ -29,17 +30,20 @@ var rootCmd = &cobra.Command{
 		camel := args[0]
 		snake := camelToSnake(camel)
 		plural := pluralize(snake)
+		lowerCamelCase := strings.ToLower(camel[:1]) + camel[1:]
 		data := TemplateData{
-			ModelName: camel,
-			BasePath:  plural,
-			Snake:     snake,
-			TableName: plural,
+			ModelName:      camel,
+			BasePath:       plural,
+			Snake:          snake,
+			TableName:      plural,
+			LowerCamelCase: lowerCamelCase,
 		}
 		generateFromTemplate("model.go.tpl", fmt.Sprintf("./model/%s.go", snake), data)
 		generateFromTemplate("service.go.tpl", fmt.Sprintf("./service/%s.go", snake), data)
 		generateFromTemplate("service_test.go.tpl", fmt.Sprintf("./service/%s_test.go", snake), data)
 		generateFromTemplate("handler.go.tpl", fmt.Sprintf("./handler/%s.go", snake), data)
 		generateFromTemplate("repository.go.tpl", fmt.Sprintf("./repository/%s.go", snake), data)
+		generateFromTemplate("usecase.go.tpl", fmt.Sprintf("./usecase/%s.go", snake), data)
 	},
 }
 
