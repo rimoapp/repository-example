@@ -11,12 +11,12 @@ import (
 
 type UserHandler struct {
 	baseGenericHandler[*model.User, *model.UserListOption]
-	Service service.UserService
+	svc service.UserService
 }
 
 func NewUserHandler(svc service.UserService) *UserHandler {
 	handler := NewGenericHandler(svc, "userID")
-	return &UserHandler{baseGenericHandler: *handler, Service: svc}
+	return &UserHandler{baseGenericHandler: *handler, svc: svc}
 }
 
 func (h *UserHandler) List(c *gin.Context) {
@@ -26,7 +26,7 @@ func (h *UserHandler) List(c *gin.Context) {
 		return
 	}
 	opts.UserID = c.GetString("user_id")
-	entities, err := h.Service.List(c, opts)
+	entities, err := h.svc.List(c, opts)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
