@@ -33,6 +33,7 @@ func NewRouter() (RimoRouter, error) {
 	teamRepository := repository.NewTeamRepository(repoOpts)
 	userRepository := repository.NewUserRepository(repoOpts)
 	noteRepository := repository.NewNoteRepository(repoOpts)
+
 	// build services
 	noteService := service.NewNoteService(noteRepository)
 	userService := service.NewUserService(userRepository)
@@ -50,6 +51,7 @@ func NewRouter() (RimoRouter, error) {
 	teamHandler := handler.NewTeamHandler(teamUseCase)
 	userHandler := handler.NewUserHandler(userUseCase)
 	noteHandler := handler.NewNoteHandler(noteUseCase)
+
 	// set routing
 	userHandler.SetRouter(rootGroup)
 	noteHandler.SetRouter(rootGroup)

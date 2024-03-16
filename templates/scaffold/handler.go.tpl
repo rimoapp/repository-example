@@ -12,9 +12,9 @@ type {{.ModelName}}Handler struct {
 }
 
 
-func New{{.ModelName}}Handler(useCase usecase.{{.ModelName}}UseCase) *{{.ModelName}}Handler {
+func New{{.ModelName}}Handler(useCase usecase.{{.ModelName}}UseCase) {{.ModelName}}Handler {
 	handler := NewGenericHandler(&svc, "{{.Snake}}ID")
-	return &{{.ModelName}}Handler{baseGenericHandler: *handler, useCase: useCase}
+	return {{.ModelName}}Handler{baseGenericHandler: handler, useCase: useCase}
 }
 
 func (h *{{.ModelName}}Handler) SetRouter(group *gin.RouterGroup) {

@@ -16,9 +16,9 @@ type OrganizationHandler struct {
 	useCase usecase.OrganizationUseCase
 }
 
-func NewOrganizationHandler(useCase usecase.OrganizationUseCase) *OrganizationHandler {
+func NewOrganizationHandler(useCase usecase.OrganizationUseCase) OrganizationHandler {
 	handler := NewGenericHandler(useCase, "organizationID")
-	return &OrganizationHandler{baseGenericHandler: *handler, useCase: useCase}
+	return OrganizationHandler{baseGenericHandler: handler, useCase: useCase}
 }
 
 func (h *OrganizationHandler) Get(c *gin.Context) {

@@ -5,17 +5,17 @@
 
 ## 設計方針
 
-- model 層 / repository 層 / service 層 / handler 層 と大きく 4 つの層に分かれる
+- Model 層 / Repository 層 / Service 層 / Usecase 層 / Handler 層 と大きく 5 つの層に分かれる
 - 現状 firestore と gorm を用いた RDB に対応している
 
-### model
+### Model
 
 - 各 model ごとに、model 名や Field 等を定義する
   - ex. Note, User ..
 - また、response の時の json 名、firestore に保存するカラム名、gorm に関する設定もここで定義する
 - [詳細ページ](./model.md)
 
-### repository
+### Repository
 
 - DB へのアクセスに関するロジックを持つ
 - 各 model ごとに Repository が作られれるが、基本的に必要な関数は共通化されている
@@ -34,11 +34,20 @@
   - もちろん service によっては使わない関数も存在する
 - [詳細ページ](./service.md)
 
+### Usecase
+
+- 各 model ごとに usecase が作られる
+  - ex. NoteUsecase, UserUsecase ..
+- service 層を受け取って生成される
+- ある model の操作を行う時、他の Service を呼び出すような処理を行う場合、その記述をここに書く
+  - ex. TeamUseCase.AddMember
+- [詳細ページ](./usecase.md)
+
 ### Handler
 
 - 各 model ごとに handler が作られる
   - ex. NoteHandler, UserHandler ..
-- service 層を受け取って生成される
+- usecase 層を受け取って生成される
 - [handler の詳細ページ](./handler.md)
 
 ## メリット
@@ -61,6 +70,7 @@
   - service/note.go
   - service/note_test.go
   - handler/note.go
+  - usecase/note.go
   - repository/note.go
 - メモ
   - model の各 Field は実装されないので cmd 実行後実装してください

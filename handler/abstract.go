@@ -17,8 +17,8 @@ type baseGenericHandler[T model.AbstractAssociatedEntity, U model.AbstractListOp
 	idParam string
 }
 
-func NewGenericHandler[T model.AbstractAssociatedEntity, U model.AbstractListOption](useCase usecase.AbstractGenericUseCase[T, U], idParam string) *baseGenericHandler[T, U] {
-	return &baseGenericHandler[T, U]{useCase: useCase, idParam: idParam}
+func NewGenericHandler[T model.AbstractAssociatedEntity, U model.AbstractListOption](useCase usecase.AbstractGenericUseCase[T, U], idParam string) baseGenericHandler[T, U] {
+	return baseGenericHandler[T, U]{useCase: useCase, idParam: idParam}
 }
 
 func (h *baseGenericHandler[T, U]) authWithEntity(c *gin.Context) (T, bool) {
@@ -48,8 +48,9 @@ func (h *baseGenericHandler[T, U]) Get(c *gin.Context) {
 }
 
 func (h *baseGenericHandler[T, U]) Create(c *gin.Context) {
-	entity, err := bindAndValidate[T](c)
-	if err != nil {
+	entity := createNewInstance[T]()
+	if err := c.ShouldBind(&entity); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": errors.Wrap(err, "failed to bind params").Error()})
 		return
 	}
 
@@ -98,8 +99,9 @@ func (h *baseGenericHandler[T, U]) Update(c *gin.Context) {
 }
 
 func (h *baseGenericHandler[T, U]) List(c *gin.Context) {
-	opts, err := bindAndValidate[U](c)
-	if err != nil {
+	opts := createNewInstance[U]()
+	if err := c.ShouldBind(&opts); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": errors.Wrap(err, "failed to bind params").Error()})
 		return
 	}
 
@@ -118,21 +120,16 @@ func (h *baseGenericHandler[T, U]) List(c *gin.Context) {
 	c.JSON(http.StatusOK, filtered)
 }
 
-func bindAndValidate[V any](c *gin.Context) (V, error) {
-	t := reflect.TypeOf((*V)(nil)).Elem()
-	ptr := reflect.New(t)
-
-	var empty V
-	if err := c.ShouldBind(ptr.Interface()); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": errors.Wrap(err, "failed to bind params").Error()})
-		return empty, errors.Wrap(err, "failed to bind params")
+func createNewInstance[T any]() T {
+	var entity T
+	// reflect.TypeOf を使用して T の型情報を取得
+	t := reflect.TypeOf(entity)
+	// T がポインタ型の場合、新しいインスタンスを生成
+	if t.Kind() == reflect.Ptr {
+		// 新しいインスタンスを生成して返す
+		newInstance := reflect.New(t.Elem()).Interface()
+		return newInstance.(T)
 	}
-
-	opts, ok := ptr.Elem().Interface().(V)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to cast options to the correct type"})
-		return empty, errors.New("failed to cast options to the correct type")
-	}
-
-	return opts, nil
+	// ポインタでない場合はそのままデフォルト値を返す
+	return entity
 }

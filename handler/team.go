@@ -16,9 +16,9 @@ type TeamHandler struct {
 	useCase usecase.TeamUseCase
 }
 
-func NewTeamHandler(useCase usecase.TeamUseCase) *TeamHandler {
+func NewTeamHandler(useCase usecase.TeamUseCase) TeamHandler {
 	handler := NewGenericHandler(useCase, "teamID")
-	return &TeamHandler{baseGenericHandler: *handler, useCase: useCase}
+	return TeamHandler{baseGenericHandler: handler, useCase: useCase}
 }
 
 func (h *TeamHandler) List(c *gin.Context) {

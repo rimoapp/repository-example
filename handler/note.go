@@ -11,9 +11,9 @@ type NoteHandler struct {
 	useCase usecase.NoteUseCase
 }
 
-func NewNoteHandler(useCase usecase.NoteUseCase) *NoteHandler {
+func NewNoteHandler(useCase usecase.NoteUseCase) NoteHandler {
 	handler := NewGenericHandler(useCase, "noteID")
-	return &NoteHandler{baseGenericHandler: *handler, useCase: useCase}
+	return NoteHandler{baseGenericHandler: handler, useCase: useCase}
 }
 
 func (h *NoteHandler) SetRouter(group *gin.RouterGroup) {

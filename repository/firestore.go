@@ -70,7 +70,6 @@ func (r *firestoreGenericRepository[T]) delete(ctx context.Context, id, collecti
 	return err
 }
 func (r *firestoreGenericRepository[T]) Create(ctx context.Context, obj T) (string, error) {
-	obj.HooksBeforeCreate(time.Now())
 	return r.create(ctx, obj, r.collectionPath)
 }
 func (r *firestoreGenericRepository[T]) create(ctx context.Context, obj T, collectionPath string) (string, error) {
