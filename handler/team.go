@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/rimoapp/repository-example/model"
-	"github.com/rimoapp/repository-example/repository"
 	"github.com/rimoapp/repository-example/service"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,13 +16,9 @@ type TeamHandler struct {
 	Service *service.TeamService
 }
 
-func NewTeamHandler(opts repository.NewRepositoryOption) *TeamHandler {
-	repo := repository.NewTeamRepository(opts)
-	userRepo := repository.NewUserRepository(opts)
-	userSvc := service.NewUserService(userRepo)
-	svc := service.NewTeamService(repo, userSvc)
-	handler := NewGenericHandler(svc, "teamID")
-	return &TeamHandler{baseGenericHandler: *handler, Service: svc}
+func NewTeamHandler(svc service.TeamService) *TeamHandler {
+	handler := NewGenericHandler(&svc, "teamID")
+	return &TeamHandler{baseGenericHandler: *handler, Service: &svc}
 }
 
 func (h *TeamHandler) List(c *gin.Context) {

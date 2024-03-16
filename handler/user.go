@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/rimoapp/repository-example/model"
-	"github.com/rimoapp/repository-example/repository"
 	"github.com/rimoapp/repository-example/service"
 )
 
@@ -15,14 +14,9 @@ type UserHandler struct {
 	Service *service.UserService
 }
 
-func NewUserHandler(opts repository.NewRepositoryOption) *UserHandler {
-	repo := repository.NewUserRepository(opts)
-	return newUserHandler(repo)
-}
-func newUserHandler(repo repository.UserRepository) *UserHandler {
-	svc := service.NewUserService(repo)
-	handler := NewGenericHandler(svc, "userID")
-	return &UserHandler{baseGenericHandler: *handler, Service: svc}
+func NewUserHandler(svc service.UserService) *UserHandler {
+	handler := NewGenericHandler(&svc, "userID")
+	return &UserHandler{baseGenericHandler: *handler, Service: &svc}
 }
 
 func (h *UserHandler) List(c *gin.Context) {

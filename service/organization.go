@@ -14,9 +14,9 @@ type OrganizationService struct {
 	TeamService *TeamService
 }
 
-func NewOrganizationService(repo repository.OrganizationRepository, teamService *TeamService) *OrganizationService {
+func NewOrganizationService(repo repository.OrganizationRepository, teamService TeamService) OrganizationService {
 	base := newGenericService(repo)
-	return &OrganizationService{Repo: repo, baseGenericService: base, TeamService: teamService}
+	return OrganizationService{Repo: repo, baseGenericService: base, TeamService: &teamService}
 }
 
 func (s *OrganizationService) Create(ctx context.Context, object *model.Organization) (string, error) {

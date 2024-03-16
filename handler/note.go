@@ -3,7 +3,6 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/rimoapp/repository-example/model"
-	"github.com/rimoapp/repository-example/repository"
 	"github.com/rimoapp/repository-example/service"
 )
 
@@ -12,14 +11,9 @@ type NoteHandler struct {
 	svc *service.NoteService
 }
 
-func NewNoteHandler(opts repository.NewRepositoryOption) *NoteHandler {
-	repo := repository.NewNoteRepository(opts)
-	return newNoteHandler(repo)
-}
-func newNoteHandler(repo repository.NoteRepository) *NoteHandler {
-	svc := service.NewNoteService(repo)
-	handler := NewGenericHandler(svc, "noteID")
-	return &NoteHandler{baseGenericHandler: *handler, svc: svc}
+func NewNoteHandler(svc service.NoteService) *NoteHandler {
+	handler := NewGenericHandler(&svc, "noteID")
+	return &NoteHandler{baseGenericHandler: *handler, svc: &svc}
 }
 
 func (h *NoteHandler) SetRouter(group *gin.RouterGroup) {

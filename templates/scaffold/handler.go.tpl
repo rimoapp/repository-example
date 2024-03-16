@@ -12,14 +12,10 @@ type {{.ModelName}}Handler struct {
 	svc *service.{{.ModelName}}Service
 }
 
-func New{{.ModelName}}Handler(opts repository.NewRepositoryOption) *{{.ModelName}}Handler {
-	repo := repository.New{{.ModelName}}Repository(opts)
-	return new{{.ModelName}}Handler(repo)
-}
-func new{{.ModelName}}Handler(repo repository.{{.ModelName}}Repository) *{{.ModelName}}Handler {
-	svc := service.New{{.ModelName}}Service(repo)
-	handler := NewGenericHandler(svc, "{{.Snake}}ID")
-	return &{{.ModelName}}Handler{baseGenericHandler: *handler, svc: svc}
+
+func New{{.ModelName}}Handler(svc service.{{.ModelName}}Service) *{{.ModelName}}Handler {
+	handler := NewGenericHandler(&svc, "{{.Snake}}ID")
+	return &{{.ModelName}}Handler{baseGenericHandler: *handler, svc: &svc}
 }
 
 func (h *{{.ModelName}}Handler) SetRouter(group *gin.RouterGroup) {

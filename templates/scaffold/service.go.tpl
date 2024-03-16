@@ -10,7 +10,7 @@ type {{.ModelName}}Service struct {
 	baseGenericService[*model.{{.ModelName}}, *model.{{.ModelName}}ListOption]
 }
 
-func New{{.ModelName}}Service(repo repository.{{.ModelName}}Repository) *{{.ModelName}}Service {
+func New{{.ModelName}}Service(repo repository.{{.ModelName}}Repository) {{.ModelName}}Service {
 	base := newGenericService(repo)
-	return &{{.ModelName}}Service{Repo: repo, baseGenericService: base}
+	return {{.ModelName}}Service{Repo: repo, baseGenericService: base}
 }

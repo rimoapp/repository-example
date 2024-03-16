@@ -22,14 +22,14 @@ type TeamRepository interface {
 
 const teamsCollectionPath = "teams"
 
-func NewTeamRepository(opts NewRepositoryOption) TeamRepository {
-	if opts.DBClient != nil {
+func NewTeamRepository(opts *NewRepositoryOption) TeamRepository {
+	if opts.dbClient != nil {
 		return &gormTeamRepository{
-			gormGenericRepository: *newGormGenericRepository[*model.Team](opts.DBClient),
+			gormGenericRepository: *newGormGenericRepository[*model.Team](opts.dbClient),
 		}
 	}
 	return &firestoreTeamRepository{
-		firestoreGenericRepository: *newFirestoreGenericRepository[*model.Team](opts.FirestoreClient, teamsCollectionPath),
+		firestoreGenericRepository: *newFirestoreGenericRepository[*model.Team](opts.firestoreClient, teamsCollectionPath),
 	}
 }
 

@@ -14,9 +14,9 @@ type TeamService struct {
 	userService *UserService
 }
 
-func NewTeamService(repo repository.TeamRepository, userService *UserService) *TeamService {
+func NewTeamService(repo repository.TeamRepository, userService UserService) TeamService {
 	base := newGenericService(repo)
-	return &TeamService{repo: repo, baseGenericService: base, userService: userService}
+	return TeamService{repo: repo, baseGenericService: base, userService: &userService}
 }
 
 func (s *TeamService) AddMember(ctx context.Context, teamID, userID string) error {

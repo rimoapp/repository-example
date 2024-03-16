@@ -19,14 +19,14 @@ type {{.ModelName}}Repository interface {
 
 const {{.TableName}}CollectionPath = "{{.TableName}}"
 
-func New{{.ModelName}}Repository(opts NewRepositoryOption) {{.ModelName}}Repository {
-	if opts.DBClient != nil {
+func New{{.ModelName}}Repository(opts *NewRepositoryOption) {{.ModelName}}Repository {
+	if opts.dbClient != nil {
 		return &gorm{{.ModelName}}Repository{
-			gormGenericRepository: *newGormGenericRepository[*model.{{.ModelName}}](opts.DBClient),
+			gormGenericRepository: *newGormGenericRepository[*model.{{.ModelName}}](opts.dbClient),
 		}
 	}
 	return &firestore{{.ModelName}}Repository{
-		firestoreGenericRepository: *newFirestoreGenericRepository[*model.{{.ModelName}}](opts.FirestoreClient, {{.TableName}}CollectionPath),
+		firestoreGenericRepository: *newFirestoreGenericRepository[*model.{{.ModelName}}](opts.firestoreClient, {{.TableName}}CollectionPath),
 	}
 }
 

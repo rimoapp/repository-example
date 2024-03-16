@@ -10,9 +10,9 @@ type NoteService struct {
 	baseGenericService[*model.Note, *model.NoteListOption]
 }
 
-func NewNoteService(repo repository.NoteRepository) *NoteService {
+func NewNoteService(repo repository.NoteRepository) NoteService {
 	base := newGenericService(repo)
-	return &NoteService{Repo: repo, baseGenericService: base}
+	return NoteService{Repo: repo, baseGenericService: base}
 }
 
 var _ AbstractGenericService[*model.Note, *model.NoteListOption] = &NoteService{}
