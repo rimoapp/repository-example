@@ -15,7 +15,7 @@ import (
 type AbstractEntity interface {
 	GetID() string
 	SetID(id string)
-	BeforeCreate(now time.Time)
+	HooksBeforeCreate(now time.Time)
 }
 
 type AbstractAssociatedEntity interface {
@@ -49,7 +49,7 @@ func (a *BaseEntity) GetID() string {
 	}
 	return a.ID
 }
-func (a *BaseEntity) BeforeCreate(now time.Time) {
+func (a *BaseEntity) HooksBeforeCreate(now time.Time) {
 	if a.CreatedAt.IsZero() {
 		a.CreatedAt = now
 	}

@@ -49,7 +49,7 @@ func (r *gormGenericRepository[T]) Delete(ctx context.Context, id string) error 
 }
 
 func (r *gormGenericRepository[T]) Create(ctx context.Context, object T) (string, error) {
-	object.BeforeCreate(time.Now())
+	object.HooksBeforeCreate(time.Now())
 	result := r.client.Create(object)
 	return object.GetID(), result.Error
 }
