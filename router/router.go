@@ -9,6 +9,7 @@ import (
 	"github.com/rimoapp/repository-example/middleware"
 	"github.com/rimoapp/repository-example/repository"
 	"github.com/rimoapp/repository-example/service"
+	"github.com/rimoapp/repository-example/usecase"
 )
 
 type RimoRouter struct {
@@ -35,13 +36,20 @@ func NewRouter() (RimoRouter, error) {
 	// build services
 	noteService := service.NewNoteService(noteRepository)
 	userService := service.NewUserService(userRepository)
-	teamService := service.NewTeamService(teamRepository, userService)
-	orgService := service.NewOrganizationService(orgRepository, teamService)
+	teamService := service.NewTeamService(teamRepository)
+	orgService := service.NewOrganizationService(orgRepository)
+
+	// build use cases
+	organizationUseCase := usecase.NewOrganizationUseCase(orgService, teamService)
+	noteUseCase := usecase.NewNoteUseCase(noteService)
+	userUseCase := usecase.NewUserUseCase(userService)
+	teamUseCase := usecase.NewTeamUseCase(teamService, userService)
+
 	// build handlers
-	orgHandler := handler.NewOrganizationHandler(orgService)
-	teamHandler := handler.NewTeamHandler(teamService)
-	userHandler := handler.NewUserHandler(userService)
-	noteHandler := handler.NewNoteHandler(noteService)
+	orgHandler := handler.NewOrganizationHandler(organizationUseCase)
+	teamHandler := handler.NewTeamHandler(teamUseCase)
+	userHandler := handler.NewUserHandler(userUseCase)
+	noteHandler := handler.NewNoteHandler(noteUseCase)
 	// set routing
 	userHandler.SetRouter(rootGroup)
 	noteHandler.SetRouter(rootGroup)

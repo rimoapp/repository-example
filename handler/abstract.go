@@ -7,23 +7,23 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/rimoapp/repository-example/model"
-	"github.com/rimoapp/repository-example/service"
+	"github.com/rimoapp/repository-example/usecase"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type baseGenericHandler[T model.AbstractAssociatedEntity, U model.AbstractListOption] struct {
-	svc     service.AbstractGenericService[T, U]
+	useCase usecase.AbstractGenericUseCase[T, U]
 	idParam string
 }
 
-func NewGenericHandler[T model.AbstractAssociatedEntity, U model.AbstractListOption](service service.AbstractGenericService[T, U], idParam string) *baseGenericHandler[T, U] {
-	return &baseGenericHandler[T, U]{svc: service, idParam: idParam}
+func NewGenericHandler[T model.AbstractAssociatedEntity, U model.AbstractListOption](useCase usecase.AbstractGenericUseCase[T, U], idParam string) *baseGenericHandler[T, U] {
+	return &baseGenericHandler[T, U]{useCase: useCase, idParam: idParam}
 }
 
 func (h *baseGenericHandler[T, U]) authWithEntity(c *gin.Context) (T, bool) {
 	id := c.Param(h.idParam)
-	entity, err := h.svc.Get(c, id)
+	entity, err := h.useCase.Get(c, id)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
 			c.JSON(http.StatusNotFound, gin.H{"message": "not found"})
@@ -54,7 +54,7 @@ func (h *baseGenericHandler[T, U]) Create(c *gin.Context) {
 	}
 
 	entity.SetCreatorID(c.GetString("user_id"))
-	id, err := h.svc.Create(c, entity)
+	id, err := h.useCase.Create(c, entity)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
@@ -68,7 +68,7 @@ func (h *baseGenericHandler[T, U]) Delete(c *gin.Context) {
 	if !authorized {
 		return
 	}
-	if err := h.svc.Delete(c, entity.GetID()); err != nil {
+	if err := h.useCase.Delete(c, entity.GetID()); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
 	}
@@ -85,11 +85,11 @@ func (h *baseGenericHandler[T, U]) Update(c *gin.Context) {
 	if !authorized {
 		return
 	}
-	if err := h.svc.Update(c, entity.GetID(), req); err != nil {
+	if err := h.useCase.Update(c, entity.GetID(), req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
 	}
-	entity, err := h.svc.Get(c, entity.GetID())
+	entity, err := h.useCase.Get(c, entity.GetID())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
@@ -104,7 +104,7 @@ func (h *baseGenericHandler[T, U]) List(c *gin.Context) {
 	}
 
 	opts.SetUserID(c.GetString("user_id"))
-	entities, err := h.svc.List(c, opts)
+	entities, err := h.useCase.List(c, opts)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return

@@ -6,19 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/rimoapp/repository-example/model"
-	"github.com/rimoapp/repository-example/service"
+	"github.com/rimoapp/repository-example/usecase"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type TeamHandler struct {
 	baseGenericHandler[*model.Team, *model.TeamListOption]
-	svc service.TeamService
+	useCase usecase.TeamUseCase
 }
 
-func NewTeamHandler(svc service.TeamService) *TeamHandler {
-	handler := NewGenericHandler(svc, "teamID")
-	return &TeamHandler{baseGenericHandler: *handler, svc: svc}
+func NewTeamHandler(useCase usecase.TeamUseCase) *TeamHandler {
+	handler := NewGenericHandler(useCase, "teamID")
+	return &TeamHandler{baseGenericHandler: *handler, useCase: useCase}
 }
 
 func (h *TeamHandler) List(c *gin.Context) {
@@ -29,7 +29,7 @@ func (h *TeamHandler) List(c *gin.Context) {
 	}
 	opts.OrganizationID = c.Param("organizationID")
 	opts.UserID = c.GetString("user_id")
-	entities, err := h.svc.List(c, opts)
+	entities, err := h.useCase.List(c, opts)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
@@ -57,7 +57,7 @@ func (h *TeamHandler) SetRouter(group *gin.RouterGroup) {
 
 func (h *TeamHandler) authWithEntity(c *gin.Context) (*model.Team, bool) {
 	id := c.Param("teamID")
-	entity, err := h.svc.Get(c, id)
+	entity, err := h.useCase.Get(c, id)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
 			c.JSON(http.StatusNotFound, gin.H{"message": "not found"})
@@ -93,7 +93,7 @@ func (h *TeamHandler) Create(c *gin.Context) {
 	}
 	entity.OrganizationID = c.Param("organizationID")
 	entity.SetCreatorID(c.GetString("user_id"))
-	id, err := h.svc.Create(c, entity)
+	id, err := h.useCase.Create(c, entity)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
@@ -107,7 +107,7 @@ func (h *TeamHandler) Delete(c *gin.Context) {
 	if !authorized {
 		return
 	}
-	if err := h.svc.Delete(c, entity.GetID()); err != nil {
+	if err := h.useCase.Delete(c, entity.GetID()); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
 	}
@@ -124,11 +124,11 @@ func (h *TeamHandler) Update(c *gin.Context) {
 	if !authorized {
 		return
 	}
-	if err := h.svc.Update(c, entity.GetID(), req); err != nil {
+	if err := h.useCase.Update(c, entity.GetID(), req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
 	}
-	entity, err := h.svc.Get(c, entity.GetID())
+	entity, err := h.useCase.Get(c, entity.GetID())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return
@@ -140,7 +140,7 @@ func (h *TeamHandler) Update(c *gin.Context) {
 func (h *TeamHandler) AddTeamMember(c *gin.Context) {
 	teamID := c.Param("teamID")
 	userID := c.Param("userID")
-	err := h.svc.AddMember(c, teamID, userID)
+	err := h.useCase.AddMember(c, teamID, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to add member").Error()})
 		return
@@ -152,7 +152,7 @@ func (h *TeamHandler) AddTeamMember(c *gin.Context) {
 func (h *TeamHandler) DeleteTeamMember(c *gin.Context) {
 	teamID := c.Param("teamID")
 	userID := c.Param("userID")
-	err := h.svc.DeleteMember(c, teamID, userID)
+	err := h.useCase.DeleteMember(c, teamID, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to delete member").Error()})
 		return

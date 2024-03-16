@@ -43,6 +43,7 @@ var rootCmd = &cobra.Command{
 		generateFromTemplate("service_test.go.tpl", fmt.Sprintf("./service/%s_test.go", snake), data)
 		generateFromTemplate("handler.go.tpl", fmt.Sprintf("./handler/%s.go", snake), data)
 		generateFromTemplate("repository.go.tpl", fmt.Sprintf("./repository/%s.go", snake), data)
+		generateFromTemplate("usecase.go.tpl", fmt.Sprintf("./usecase/%s.go", snake), data)
 	},
 }
 

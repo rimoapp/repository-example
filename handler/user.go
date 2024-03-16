@@ -6,17 +6,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/rimoapp/repository-example/model"
-	"github.com/rimoapp/repository-example/service"
+	"github.com/rimoapp/repository-example/usecase"
 )
 
 type UserHandler struct {
 	baseGenericHandler[*model.User, *model.UserListOption]
-	svc service.UserService
+	useCase usecase.UserUseCase
 }
 
-func NewUserHandler(svc service.UserService) *UserHandler {
-	handler := NewGenericHandler(svc, "userID")
-	return &UserHandler{baseGenericHandler: *handler, svc: svc}
+func NewUserHandler(useCase usecase.UserUseCase) *UserHandler {
+	handler := NewGenericHandler(useCase, "userID")
+	return &UserHandler{baseGenericHandler: *handler, useCase: useCase}
 }
 
 func (h *UserHandler) List(c *gin.Context) {
@@ -26,7 +26,7 @@ func (h *UserHandler) List(c *gin.Context) {
 		return
 	}
 	opts.UserID = c.GetString("user_id")
-	entities, err := h.svc.List(c, opts)
+	entities, err := h.useCase.List(c, opts)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": errors.Wrap(err, "failed to create").Error()})
 		return

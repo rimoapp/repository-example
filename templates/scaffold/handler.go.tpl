@@ -3,19 +3,18 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/rimoapp/repository-example/model"
-	"github.com/rimoapp/repository-example/repository"
-	"github.com/rimoapp/repository-example/service"
+	"github.com/rimoapp/repository-example/usecase"
 )
 
 type {{.ModelName}}Handler struct {
 	baseGenericHandler[*model.{{.ModelName}}, *model.{{.ModelName}}ListOption]
-	svc service.{{.ModelName}}Service
+	useCase usecase.{{.ModelName}}UseCase
 }
 
 
-func New{{.ModelName}}Handler(svc service.{{.ModelName}}Service) *{{.ModelName}}Handler {
+func New{{.ModelName}}Handler(useCase usecase.{{.ModelName}}UseCase) *{{.ModelName}}Handler {
 	handler := NewGenericHandler(&svc, "{{.Snake}}ID")
-	return &{{.ModelName}}Handler{baseGenericHandler: *handler, svc: svc}
+	return &{{.ModelName}}Handler{baseGenericHandler: *handler, useCase: useCase}
 }
 
 func (h *{{.ModelName}}Handler) SetRouter(group *gin.RouterGroup) {
