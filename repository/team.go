@@ -9,7 +9,6 @@ import (
 	"github.com/rimoapp/repository-example/model"
 )
 
-// TODO: Delete unused functions
 type TeamRepository interface {
 	Get(ctx context.Context, id string) (*model.Team, error)
 	Delete(ctx context.Context, id string) error

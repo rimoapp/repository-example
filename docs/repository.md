@@ -71,3 +71,17 @@ func (r *gormNoteRepository) List(ctx context.Context, opts *model.NoteListOptio
 上記 Interface は満たさないと GenericService や GenericHandler が使えなくなるので注意が必要
 
 ただ関数が増える分には問題はないので、必要な関数は追加することで対応可能
+
+```go
+type TeamRepository interface {
+	Get(ctx context.Context, id string) (*model.Team, error)
+	Delete(ctx context.Context, id string) error
+	Create(ctx context.Context, object *model.Team) (string, error)
+	Update(ctx context.Context, id string, keyValues map[string]interface{}) error
+	List(ctx context.Context, opts *model.TeamListOption) ([]*model.Team, error)
+	Set(ctx context.Context, id string, object *model.Team) error
+	AddMember(ctx context.Context, teamID string, user *model.User) error
+	DeleteMember(ctx context.Context, teamID string, user *model.User) error
+}
+
+```
