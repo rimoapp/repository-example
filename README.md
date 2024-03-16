@@ -1,0 +1,2 @@
+# repository-example
+repository層を導入するにあたって、その構成を使うexampleを置くところ
