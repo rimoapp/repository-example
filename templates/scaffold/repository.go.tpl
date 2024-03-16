@@ -7,7 +7,6 @@ import (
 	"github.com/rimoapp/repository-example/model"
 )
 
-// TODO: Delete unused functions
 type {{.ModelName}}Repository interface {
 	Get(ctx context.Context, id string) (*model.{{.ModelName}}, error)
 	Delete(ctx context.Context, id string) error

@@ -11,12 +11,12 @@ import (
 
 type UserHandler struct {
 	baseGenericHandler[*model.User, *model.UserListOption]
-	Service *service.UserService
+	Service service.UserService
 }
 
 func NewUserHandler(svc service.UserService) *UserHandler {
-	handler := NewGenericHandler(&svc, "userID")
-	return &UserHandler{baseGenericHandler: *handler, Service: &svc}
+	handler := NewGenericHandler(svc, "userID")
+	return &UserHandler{baseGenericHandler: *handler, Service: svc}
 }
 
 func (h *UserHandler) List(c *gin.Context) {

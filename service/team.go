@@ -8,18 +8,25 @@ import (
 	"github.com/rimoapp/repository-example/repository"
 )
 
-type TeamService struct {
+type TeamService interface {
+	AbstractGenericService[*model.Team, *model.TeamListOption]
+
+	AddMember(ctx context.Context, teamID, userID string) error
+	DeleteMember(ctx context.Context, teamID, userID string) error
+}
+
+type teamService struct {
 	repo repository.TeamRepository
 	baseGenericService[*model.Team, *model.TeamListOption]
-	userService *UserService
+	userService UserService
 }
 
 func NewTeamService(repo repository.TeamRepository, userService UserService) TeamService {
 	base := newGenericService(repo)
-	return TeamService{repo: repo, baseGenericService: base, userService: &userService}
+	return &teamService{repo: repo, baseGenericService: base, userService: userService}
 }
 
-func (s *TeamService) AddMember(ctx context.Context, teamID, userID string) error {
+func (s *teamService) AddMember(ctx context.Context, teamID, userID string) error {
 	user, err := s.userService.Get(ctx, userID)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get user:%s", userID)
@@ -27,7 +34,7 @@ func (s *TeamService) AddMember(ctx context.Context, teamID, userID string) erro
 	return s.repo.AddMember(ctx, teamID, user)
 }
 
-func (s *TeamService) DeleteMember(ctx context.Context, teamID, userID string) error {
+func (s *teamService) DeleteMember(ctx context.Context, teamID, userID string) error {
 	user, err := s.userService.Get(ctx, userID)
 	if err != nil {
 		return err

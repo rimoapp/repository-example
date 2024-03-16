@@ -17,7 +17,7 @@ type OrganizationHandler struct {
 }
 
 func NewOrganizationHandler(svc service.OrganizationService) *OrganizationHandler {
-	handler := NewGenericHandler[*model.Organization, *model.OrganizationListOption](&svc, "organizationID")
+	handler := NewGenericHandler[*model.Organization, *model.OrganizationListOption](svc, "organizationID")
 	return &OrganizationHandler{baseGenericHandler: *handler, svc: svc}
 }
 

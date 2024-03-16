@@ -15,7 +15,7 @@ type {{.ModelName}}Handler struct {
 
 func New{{.ModelName}}Handler(svc service.{{.ModelName}}Service) *{{.ModelName}}Handler {
 	handler := NewGenericHandler(&svc, "{{.Snake}}ID")
-	return &{{.ModelName}}Handler{baseGenericHandler: *handler, svc: &svc}
+	return &{{.ModelName}}Handler{baseGenericHandler: *handler, svc: svc}
 }
 
 func (h *{{.ModelName}}Handler) SetRouter(group *gin.RouterGroup) {

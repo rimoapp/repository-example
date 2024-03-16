@@ -12,7 +12,7 @@ type NoteHandler struct {
 }
 
 func NewNoteHandler(svc service.NoteService) *NoteHandler {
-	handler := NewGenericHandler(&svc, "noteID")
+	handler := NewGenericHandler(svc, "noteID")
 	return &NoteHandler{baseGenericHandler: *handler, svc: &svc}
 }
 
