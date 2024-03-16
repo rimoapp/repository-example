@@ -17,7 +17,7 @@ func (h *baseGenericHandler[T, U]) List(c *gin.Context)
 ```go
 type NoteHandler struct {
 	baseGenericHandler[*model.Note, *model.NoteListOption]
-	svc *service.NoteService
+	svc service.NoteService
 }
 
 func NewNoteHandler(opts repository.NewRepositoryOption) *NoteHandler {

@@ -9,7 +9,7 @@ import (
 
 type {{.ModelName}}Handler struct {
 	baseGenericHandler[*model.{{.ModelName}}, *model.{{.ModelName}}ListOption]
-	svc *service.{{.ModelName}}Service
+	svc service.{{.ModelName}}Service
 }
 
 

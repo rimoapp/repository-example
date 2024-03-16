@@ -8,12 +8,12 @@ import (
 
 type NoteHandler struct {
 	baseGenericHandler[*model.Note, *model.NoteListOption]
-	svc *service.NoteService
+	svc service.NoteService
 }
 
 func NewNoteHandler(svc service.NoteService) *NoteHandler {
 	handler := NewGenericHandler(svc, "noteID")
-	return &NoteHandler{baseGenericHandler: *handler, svc: &svc}
+	return &NoteHandler{baseGenericHandler: *handler, svc: svc}
 }
 
 func (h *NoteHandler) SetRouter(group *gin.RouterGroup) {
