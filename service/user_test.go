@@ -17,7 +17,7 @@ func TestUser(t *testing.T) {
 
 	opts, err := repository.BuildNewRepositoryOptionsForTest()
 	assert.NoError(t, err)
-	repo := repository.NewUserRepository(*opts)
+	repo := repository.NewUserRepository(opts)
 	svc := NewUserService(repo)
 
 	// Test Create

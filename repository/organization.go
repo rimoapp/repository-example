@@ -18,14 +18,14 @@ type OrganizationRepository interface {
 
 const organizationsCollectionPath = "organizations"
 
-func NewOrganizationRepository(opts NewRepositoryOption) OrganizationRepository {
-	if opts.DBClient != nil {
+func NewOrganizationRepository(opts *NewRepositoryOption) OrganizationRepository {
+	if opts.dbClient != nil {
 		return &gormOrganizationRepository{
-			gormGenericRepository: *newGormGenericRepository[*model.Organization](opts.DBClient),
+			gormGenericRepository: *newGormGenericRepository[*model.Organization](opts.dbClient),
 		}
 	}
 	return &firestoreOrganizationRepository{
-		firestoreGenericRepository: *newFirestoreGenericRepository[*model.Organization](opts.FirestoreClient, organizationsCollectionPath),
+		firestoreGenericRepository: *newFirestoreGenericRepository[*model.Organization](opts.firestoreClient, organizationsCollectionPath),
 	}
 }
 

@@ -19,14 +19,14 @@ type UserRepository interface {
 
 const usersCollectionPath = "users"
 
-func NewUserRepository(opts NewRepositoryOption) UserRepository {
-	if opts.DBClient != nil {
+func NewUserRepository(opts *NewRepositoryOption) UserRepository {
+	if opts.dbClient != nil {
 		return &gormUserRepository{
-			gormGenericRepository: *newGormGenericRepository[*model.User](opts.DBClient),
+			gormGenericRepository: *newGormGenericRepository[*model.User](opts.dbClient),
 		}
 	}
 	return &firestoreUserRepository{
-		firestoreGenericRepository: *newFirestoreGenericRepository[*model.User](opts.FirestoreClient, usersCollectionPath),
+		firestoreGenericRepository: *newFirestoreGenericRepository[*model.User](opts.firestoreClient, usersCollectionPath),
 	}
 }
 

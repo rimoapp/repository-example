@@ -26,8 +26,8 @@ type AbstractGenericRepository[T model.AbstractEntity, U model.AbstractListOptio
 }
 
 type NewRepositoryOption struct {
-	FirestoreClient *firestore.Client
-	DBClient        *gorm.DB
+	firestoreClient *firestore.Client
+	dbClient        *gorm.DB
 }
 
 func BuildNewRepositoryOptions(ctx context.Context) (*NewRepositoryOption, error) {
@@ -43,7 +43,7 @@ func BuildNewRepositoryOptions(ctx context.Context) (*NewRepositoryOption, error
 			return nil, errors.Wrap(err, "failed to initialize firestore client")
 		}
 		return &NewRepositoryOption{
-			FirestoreClient: client,
+			firestoreClient: client,
 		}, nil
 	}
 	fmt.Println("gorm repository")
@@ -52,7 +52,7 @@ func BuildNewRepositoryOptions(ctx context.Context) (*NewRepositoryOption, error
 		return nil, err
 	}
 	return &NewRepositoryOption{
-		DBClient: db,
+		dbClient: db,
 	}, nil
 }
 func createNewInstance[T model.AbstractEntity]() T {
@@ -91,6 +91,6 @@ func BuildNewRepositoryOptionsForTest() (*NewRepositoryOption, error) {
 		return nil, err
 	}
 	return &NewRepositoryOption{
-		DBClient: db,
+		dbClient: db,
 	}, nil
 }

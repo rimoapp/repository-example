@@ -1,6 +1,6 @@
 # handler について
 
-handler は、HTTP リクエストを受け取り、service 層を呼び出し、レスポンスを返す役割を持つ。
+handler は、HTTP リクエストを受け取り、usecase 層を呼び出し、レスポンスを返す役割を持つ。
 
 基底クラスとして`baseGenericHandler[T model.AbstractAssociatedEntity, U model.AbstractListOption]` を定義しており、これを満たすように実装されていると、以下のような関数がそのまま使える。
 
@@ -17,14 +17,12 @@ func (h *baseGenericHandler[T, U]) List(c *gin.Context)
 ```go
 type NoteHandler struct {
 	baseGenericHandler[*model.Note, *model.NoteListOption]
-	svc *service.NoteService
+	useCase usecase.NoteUseCase
 }
 
-func NewNoteHandler(opts repository.NewRepositoryOption) *NoteHandler {
-	repo := repository.NewNoteRepository(opts)
-	svc := service.NewNoteService(repo)
-	handler := NewGenericHandler(svc, "noteID")
-	return &NoteHandler{baseGenericHandler: *handler, svc: svc}
+func NewNoteHandler(useCase usecase.NoteUseCase) NoteHandler {
+	handler := NewGenericHandler(useCase, "noteID")
+	return NoteHandler{baseGenericHandler: *handler, useCase: useCase}
 }
 
 func (h *NoteHandler) SetRouter(group *gin.RouterGroup) {
@@ -34,6 +32,7 @@ func (h *NoteHandler) SetRouter(group *gin.RouterGroup) {
 	group.DELETE("/notes/:noteID", h.Delete)
 	group.PATCH("/notes/:noteID", h.Update)
 }
+
 
 ```
 
@@ -61,7 +60,7 @@ func (h *OrganizationHandler) Get(c *gin.Context) {
 	}
 
 	id := c.Param(h.idParam)
-	entity, err := h.svc.GetWithOption(c, id, req)
+	entity, err := h.usecase.GetWithOption(c, id, req)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
 			c.JSON(http.StatusNotFound, gin.H{"message": "not found"})

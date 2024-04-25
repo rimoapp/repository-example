@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/rimoapp/repository-example/model"
 	"github.com/rimoapp/repository-example/repository"
@@ -36,6 +37,7 @@ func (s *baseGenericService[T, U]) Delete(ctx context.Context, id string) error 
 }
 
 func (s *baseGenericService[T, U]) Create(ctx context.Context, object T) (string, error) {
+	object.HooksBeforeCreate(time.Now())
 	return s.repo.Create(ctx, object)
 }
 

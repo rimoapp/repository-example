@@ -1,5 +1,9 @@
 # service について
 
+ある model に関して操作を行うための関数を持つ
+
+基本的には 該当 model に関する操作のみを行い、他 Service を呼び出すような処理は usecase に書く
+
 ## 基盤として実装されているもの
 
 ベースとなる Interface は以下のような設計になっている
@@ -16,22 +20,28 @@ type AbstractGenericService[T model.AbstractEntity, U model.AbstractListOption] 
 
 ```
 
-この Interface を満たしていると、このまま BaseGenericHandler で使えるようになる
+この Interface を満たしていると、このまま usecase.baseGenericUseCase で使えるようになる
 
 `AbstractEntity`, `AbstractListOption` については[model の詳細ページ参照](./model.md)
 
 ### 例
 
 ```go
-type NoteService struct {
-	Repo repository.NoteRepository
+type NoteService interface {
+	AbstractGenericService[*model.Note, *model.NoteListOption]
+}
+
+type noteService struct {
+	repo repository.NoteRepository
 	baseGenericService[*model.Note, *model.NoteListOption]
 }
 
-func NewNoteService(repo repository.NoteRepository) *NoteService {
+func NewNoteService(repo repository.NoteRepository) NoteService {
 	base := newGenericService(repo)
-	return &NoteService{Repo: repo, baseGenericService: base}
+	return &noteService{repo: repo, baseGenericService: base}
 }
+
+var _ NoteService = &noteService{}
 
 ```
 
@@ -41,44 +51,34 @@ func NewNoteService(repo repository.NoteRepository) *NoteService {
 
 ```go
 
-type OrganizationService struct {
-	Repo repository.OrganizationRepository
-	baseGenericService[*model.Organization, *model.OrganizationListOption]
-	TeamService *TeamService
+type TeamService interface {
+	AbstractGenericService[*model.Team, *model.TeamListOption]
+
+	AddMember(ctx context.Context, teamID string, user *model.User) error
+	DeleteMember(ctx context.Context, teamID string, user *model.User) error
 }
 
-func NewOrganizationService(repo repository.OrganizationRepository, teamService *TeamService) *OrganizationService {
+type teamService struct {
+	repo repository.TeamRepository
+	baseGenericService[*model.Team, *model.TeamListOption]
+}
+
+func NewTeamService(repo repository.TeamRepository) TeamService {
 	base := newGenericService(repo)
-	return &OrganizationService{Repo: repo, baseGenericService: base, TeamService: teamService}
+	return &teamService{repo: repo, baseGenericService: base}
 }
 
-func (s *OrganizationService) Create(ctx context.Context, object *model.Organization) (string, error) {
-	now := time.Now()
-	object.CreatedAt = now
-	object.UpdatedAt = now
-	return s.Repo.Create(ctx, object)
+func (s *teamService) AddMember(ctx context.Context, teamID string, user *model.User) error {
+	return s.repo.AddMember(ctx, teamID, user)
 }
 
-func (s *OrganizationService) GetWithOption(ctx context.Context, id string, opts *model.GetOrganizationOption) (*model.Organization, error) {
-	org, err := s.Repo.Get(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	if opts != nil && opts.IncludeTeams {
-		teams, err := s.TeamService.List(ctx, &model.TeamListOption{OrganizationID: id})
-		if err != nil {
-			return nil, err
-		}
-		org.Teams = teams
-	}
-	return org, nil
+func (s *teamService) DeleteMember(ctx context.Context, teamID string, user *model.User) error {
+	return s.repo.DeleteMember(ctx, teamID, user)
 }
 
 ```
 
-このように interface に変更がなければ既存の関数(`Create`)も再定義しても問題ない。新たな関数(`GetWithOption`)を追加することも可能
-
-また、`TeamService` のように他の service を埋め込むことも可能
+このように interface に変更がなければ新たな関数(`AddMember`)を追加することも可能
 
 ## Update について
 

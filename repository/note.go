@@ -18,14 +18,14 @@ type NoteRepository interface {
 
 const notesCollectionPath = "notes"
 
-func NewNoteRepository(opts NewRepositoryOption) NoteRepository {
-	if opts.DBClient != nil {
+func NewNoteRepository(opts *NewRepositoryOption) NoteRepository {
+	if opts.dbClient != nil {
 		return &gormNoteRepository{
-			gormGenericRepository: *newGormGenericRepository[*model.Note](opts.DBClient),
+			gormGenericRepository: *newGormGenericRepository[*model.Note](opts.dbClient),
 		}
 	}
 	return &firestoreNoteRepository{
-		firestoreGenericRepository: *newFirestoreGenericRepository[*model.Note](opts.FirestoreClient, notesCollectionPath),
+		firestoreGenericRepository: *newFirestoreGenericRepository[*model.Note](opts.firestoreClient, notesCollectionPath),
 	}
 }
 
